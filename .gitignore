@@ -4,6 +4,9 @@
 **/.idea
 **/.vscode
 
+/odoo/**/data
+/odoo/**/src
+
 # Logs
 logs
 *.log
