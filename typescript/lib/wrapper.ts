@@ -200,6 +200,34 @@ export class OdooUser {
     return response.data.result;
   }
 
+  public async searchModelFieldTypes(modelName: string): Promise<any> {
+    const params = {
+      service: 'object',
+      method: 'execute_kw',
+      args: [
+        this.database,
+        this.uid,
+        this.password,
+        modelName,
+        'fields_get',
+        [],
+        {}
+      ],
+    }
+
+    const payload = {
+      jsonrpc: '2.0',
+      method: 'call',
+      params: params,
+      id: 3,  // ID della richiesta
+    };
+
+    const response = await this.connection.client.post('', payload);
+
+    return response.data.result;
+  }
+
+  /*
   async getModelFieldTypes(modelName: string) {
     const params = {
       service: 'object',
@@ -238,6 +266,7 @@ export class OdooUser {
       return [];  // In caso di errore, restituisce un array vuoto
     }
   }
+  */
 
   async getModelFields(modelName: string) {
     const params = {
