@@ -8,6 +8,9 @@
     "dist"
   ],
   "compilerOptions": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "node",
     "jsx": "preserve"
   }
 }
