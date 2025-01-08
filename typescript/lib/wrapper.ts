@@ -17,6 +17,9 @@ odoo.exceptions.AccessDenied: Access Denied
 */
 
 import axios, { AxiosInstance } from "axios";
+import { OdooModule } from './module';
+import { OdooField } from "fields";
+import { OdooModelData } from "data";
 
 const DEBUG: boolean = false;
 
@@ -118,7 +121,7 @@ export class OdooConnection {
 
       const client: AxiosInstance = axios.create({
         baseURL: host,
-        timeout: 3000,
+        timeout: 10000,
         headers: {
           'Content-Type': 'application/json',
         },
@@ -160,6 +163,14 @@ export class OdooUser {
 
   public modelQueryBuilder<T>(modelName: string): ModelQueryBuilder<T> {
     return new ModelQueryBuilder<T>(this, modelName);
+  }
+
+  public getModule<T>(moduleName: string): OdooModule {
+    return new OdooModule(this, 475, moduleName);
+  }
+
+  public async getAllModules(): Promise<any> {
+    return await this.searchReadRecord('ir.module.module', [], [], undefined, undefined);
   }
 
   public async getModels(
@@ -594,6 +605,37 @@ export class ModelQueryBuilder<T> {
   public constructor(user: OdooUser, modelName: string) {
     this.user = user;
     this.modelName = modelName;
+  }
+
+  public async searchData(): Promise<OdooModelData> {
+    return await this.user.searchReadRecord('ir.model', [['model', '=', this.modelName]], [], [], undefined);
+  }
+
+  public async searchFieldTypes(): Promise<OdooField[]> {
+    const params = {
+      service: 'object',
+      method: 'execute_kw',
+      args: [
+        this.user.database,
+        this.user.uid,
+        this.user.password,
+        this.modelName,
+        'fields_get',
+        [],
+        {}
+      ],
+    }
+
+    const payload = {
+      jsonrpc: '2.0',
+      method: 'call',
+      params: params,
+      id: 3,  // ID della richiesta
+    };
+
+    const response = await this.user.connection.client.post('', payload);
+
+    return response.data.result;
   }
 
   public async createRecord(body: OdooRecordSyntax): Promise<number> {

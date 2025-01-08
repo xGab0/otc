@@ -1,0 +1,16 @@
+---
+import BentooModelPage from "../components/BentooModelPage.vue";
+import BentooUserPage from "../components/BentooUserPage.vue";
+import ModelList from "../components/ModelList.vue";
+import Sidebar from "../components/Sidebar.vue";
+import Welcome from "../components/Welcome.astro";
+import Layout from "../layouts/Layout.astro";
+import LayoutBento from "../layouts/LayoutBento.astro";
+---
+
+<Layout>
+  <Sidebar/>
+  <LayoutBento>
+	  <BentooModelPage client:load/>
+	</LayoutBento>
+</Layout>

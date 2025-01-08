@@ -7,17 +7,14 @@
 		<meta name="generator" content={Astro.generator} />
 		<title>Astro Basics</title>
 	</head>
-	<body>
+	<div class="layout-bento">
 		<slot />
-	</body>
+	</div>
 </html>
 
 <style>
-	html,
-	body {
-		margin: 0;
-		width: 100%;
-		height: 100%;
-		display: flex;
-	}
+.layout-bento {
+  width: 100%;
+  padding: 24px;
+}
 </style>

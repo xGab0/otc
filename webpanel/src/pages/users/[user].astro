@@ -1,0 +1,13 @@
+---
+import BentooUserPage from "../../components/BentooUserPage.vue";
+import Layout from "../../layouts/Layout.astro";
+
+const { resource, id } = Astro.params;
+
+export const prerender = false;
+---
+
+<Layout>
+<h1>{resource}: {id}</h1>
+	<BentooUserPage/>
+</Layout>
