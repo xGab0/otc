@@ -16,10 +16,10 @@ odoo.exceptions.AccessDenied: Access Denied
 
 */
 
-import axios, { AxiosInstance } from "axios";
+import axios, { type AxiosInstance } from "axios";
 import { OdooModule } from './module';
-import { OdooField } from "fields";
-import { OdooModelData } from "data";
+import type { OdooField } from "./fields";
+import type { OdooModelData } from "./data";
 
 const DEBUG: boolean = false;
 
