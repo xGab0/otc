@@ -5,7 +5,7 @@ useHead({
     class: 'html'
   },
   bodyAttrs: {
-    class: 'body'
+    class: 'main-body paper-squared'
   }
 })
 </script>
@@ -16,6 +16,7 @@ useHead({
 
 <style>
 .html {
+  /*
   height: 100vh;
 
   margin: 0;
@@ -25,22 +26,28 @@ useHead({
   border: 0px solid cyan;
 
   display: grid;
+  */
 }
 
-.body {
+.main-body {
   margin: 0;
   padding: 0;
 
   background-color: rgb(246, 246, 246);
 
-
+  /*
   span {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   }
+  */
 }
 
 #__nuxt {
-  height: 100%;
+  //height: 100%;
+}
+
+span {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
 }
 
 .paper-squared {

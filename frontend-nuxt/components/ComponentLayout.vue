@@ -23,11 +23,16 @@ onMounted(async () => {
   records.value = await queryBuilder.searchReadRecords();
   viewedRecord.value = records.value[0];
 
+  const perms = await authStore.odooUser!.searchReadRecord('ir.model.access', [['model_id.model', '=', 'hr.attendance']], [], undefined, 1);
+
   console.debug('ComponentLayout | modeldata');
   console.debug(model.value);
 
   console.debug('ComponentLayout | records');
   console.debug(records.value);
+
+  console.debug('ComponentLayout | perms');
+  console.debug(perms);
 });
 </script>
 
@@ -56,14 +61,18 @@ onMounted(async () => {
       </div>
     </div>
 
-    <div class="workspace paper-squared">
+    <div class="workspace">
       <div class="container">
         <Models :records="records"/>
       </div>
 
-      <div class="container">
+      <!--div class="container">
+        <QueryBuilder/><
+      </div-->
+
+      <!--div class="container">
         <RecordDetails v-if="viewedRecord" :record="viewedRecord"/>
-      </div>
+      </div-->
     </div>
   </div>
 </template>
@@ -75,6 +84,7 @@ onMounted(async () => {
   display: flex;
   flex-direction: column;
   gap: 20px;
+  row-gap: 20px;
 
   .header {
     display: flex;
@@ -96,15 +106,15 @@ onMounted(async () => {
 
       div {
         &:nth-child(1) {
-          width: 60px;
-          height: 60px;
+          width: 70px;
+          height: 70px;
 
           border-radius: 16px;
           background-color: rgb(255, 236, 188);
 
           svg {
-            width: 60px;
-            height: 60px;
+            width: 70px;
+            height: 70px;
           }
         }
 
@@ -113,7 +123,7 @@ onMounted(async () => {
           flex-direction: column;
 
           .title {
-            font-size: 32px;
+            font-size: 38px;
             font-weight: 700;
           }
 
@@ -130,7 +140,7 @@ onMounted(async () => {
             .module {
               width: fit-content;
 
-              font-size: 15px;
+              font-size: 14px;
               font-weight: 500;
 
               padding-top: 2px;
@@ -140,6 +150,7 @@ onMounted(async () => {
 
               border-radius: 8px;
               background-color: rgb(255, 241, 214);
+              border: solid 2px rgb(255, 232, 186);
             }
           }
         }
@@ -152,11 +163,10 @@ onMounted(async () => {
     height: 100%;
 
     display: grid;
-    grid-template-columns: auto auto;
-    gap: 30px;
+    grid-template-columns: repeat(1, auto);
+    gap: 14px;
 
     .container {
-      width: 100%;
       height: fit-content;
 
       padding: 14px;
@@ -165,6 +175,9 @@ onMounted(async () => {
       //background-color: rgb(226, 226, 226);
       background-color: white;
       box-shadow: rgba(0, 0, 0, 0.08) 0px 4px 12px;
+
+      //background: linear-gradient(90deg, rgb(253, 255, 243), rgb(255, 252, 247));
+      //backdrop-filter: blur(3px);
     }
   }
 }

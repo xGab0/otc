@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import Papa from 'papaparse';
 import BadgeModel from '~/components/badges/BadgeModel.vue';
 import ButtonDelete from '~/components/buttons/ButtonDelete.vue';
 import ButtonExport from '~/components/buttons/ButtonExport.vue';
@@ -22,13 +23,22 @@ definePageMeta({
   */
 });
 
+interface Page {
+  from: number
+  to: number
+}
+
 const { records } = defineProps<{records: HrAttendance[]}>();
 
 const authStore = useAuthStore();
 //const model = ref<OdooModelData>();
 //const fields = ref<OdooField[]>();
 
-const tableRecords = ref<TableField<HrAttendance>[]>([]);
+const tableRecords = ref<TableField<HrAttendance>[]>([]);  // Dati completi
+const recordsPerPage = ref<number>(10);  // Numero di record per pagina
+const selectedPage = ref<number>(0);   // Pagina selezionata
+const pages = ref<Page[]>([]);  // Indici delle pagine
+
 const selectedRecords = ref<TableField<HrAttendance>[]>([]);
 const allSelected = ref<boolean>(false);
 
@@ -48,6 +58,81 @@ const showCheckOuts = ref<boolean>(true);
 const showCheckOutsLat = ref<boolean>(false);
 const showCheckOutsLon = ref<boolean>(false);
 const showWorkedHours = ref<boolean>(true);
+
+watch([tableRecords, recordsPerPage], () => {
+  pages.value = getPageIndexes(tableRecords.value.length, recordsPerPage.value);
+});
+
+// Riferimento per i record da visualizzare
+const viewRecords = computed(() => {
+  // Calcola l'indice iniziale e finale in base alla pagina selezionata
+  const from = selectedPage.value * recordsPerPage.value;
+  const to = Math.min((selectedPage.value + 1) * recordsPerPage.value, tableRecords.value.length);
+
+  // Restituisce i record da visualizzare
+  return tableRecords.value.slice(from, to);
+});
+
+function getPageIndexes(totalRecords: number, recordsPerPage: number): { from: number, to: number }[] {
+  const pageIndexes: { from: number, to: number }[] = [];
+
+  // Calcolare quante pagine sono necessarie
+  const totalPages = Math.ceil(totalRecords / recordsPerPage);
+
+  for (let page = 0; page < totalPages; page++) {
+    const from = page * recordsPerPage;
+    const to = Math.min((page + 1) * recordsPerPage - 1, totalRecords - 1);
+
+    pageIndexes.push({ from, to });
+  }
+
+  return pageIndexes;
+}
+
+function validateInput(event) {
+    const input = event.target;
+    // Permetti solo numeri (includendo numeri decimali)
+    input.value = input.value.replace(/[^0-9.]/g, '');
+}
+
+// Funzione per generare il CSV
+function generateCSV(records: TableField<HrAttendance>[]) {
+  if (records.length === 0) return '';
+
+  const headers = Object.keys(records[0].record) as Array<keyof HrAttendance>;
+  const csvRows = [];
+  csvRows.push(headers.join(','));
+
+  for (const recordField of records) {
+    const row = headers.map(header => {
+      const value = recordField.record[header];
+      return `"${(value ?? '').toString().replace(/"/g, '""')}"`;
+    });
+    csvRows.push(row.join(','));
+  }
+
+  return csvRows.join('\n');
+}
+
+// Funzione per scaricare il CSV
+function downloadCSV(records: TableField<HrAttendance>[]) {
+  const csv = generateCSV(records);
+  
+  // Crea un Blob con il contenuto CSV
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+
+  // Crea un URL temporaneo per il Blob
+  const url = URL.createObjectURL(blob);
+
+  // Rilascia l'URL dopo il download
+  URL.revokeObjectURL(url);
+}
+
+// Funzione per scaricare solo i record selezionati
+function downloadSelectedRecords() {
+  const selected = selectedRecords.value.filter(record => record.selected);
+  downloadCSV(selected);
+}
 
 const sortAlpha = () => {
   tableRecords.value.sort((a, b) => {
@@ -104,13 +189,30 @@ const sortNumberInverse = () => {
 }
 
 function handleSelection(index: number, selected: boolean) {
-  tableRecords.value[index].selected = selected;
+  const tableRecord = tableRecords.value[index];
+  tableRecord.selected = selected;
+
+  if (selected) {
+    selectedRecords.value[index] = tableRecord;
+  } else {
+    selectedRecords.value.splice(index, 1);
+  }
+
   console.log(`Updated row [${index}] to ${selected}`);
 }
 
 function toggleAllSelections() {
-  allSelected.value = !allSelected.value
-  tableRecords.value.forEach(record => record.selected = allSelected.value);
+  const selected = allSelected.value = !allSelected.value;
+
+  tableRecords.value.forEach(record => {
+    record.selected = selected;
+
+    if (selected) {
+      selectedRecords.value.push(record);
+    } else {
+      selectedRecords.value.length = 0;
+    }
+  });
 }
 
 onMounted(() => {
@@ -133,6 +235,8 @@ onMounted(() => {
   console.log('employers');
   console.log(employeers.value);
 
+  pages.value = getPageIndexes(tableRecords.value.length, recordsPerPage.value)
+
   loaded.value = true;
 })
 </script>
@@ -142,8 +246,14 @@ onMounted(() => {
     <div class="header">
       <div>
         <ButtonFilters/>
-        <ButtonFilters/>
-        <ButtonFilters/>
+
+        <!--span>records length: {{ tableRecords.length }}</span>
+        <span> | </span>
+        <span>records per page: {{ recordsPerPage }}</span>
+        <span> | </span>
+        <span>generated pages: {{ pages.length }}</span>
+        <span> | </span>
+        <span>selected page: {{ selectedPage }}</span-->
       </div>
       <div>
         <input type="search" placeholder="search elements"/>
@@ -158,6 +268,44 @@ onMounted(() => {
         <AttendanceColumn name="Work Hours" :data="workedHours"/>
       </div>
     </div-->
+
+    <div class="table-controllers">
+      <div class="left">
+        <span class="value">{{ recordsPerPage }}</span>
+        <span> results of </span>
+        <span class="value">{{ tableRecords.length }}</span>
+      </div>
+
+      <div class="right">
+        <div>
+          <span>elements per page </span>
+          <input
+            v-model="recordsPerPage"
+            type="number"
+            id="quantity"
+            name="quantity"
+            :placeholder="recordsPerPage.toString"
+            :min="1"
+            :max="tableRecords.length"
+          >
+        </div>
+
+        <div>
+          <span>page </span>
+          <input
+            v-model="selectedPage"
+            type="number"
+            id="quantity"
+            name="quantity"
+            :placeholder="selectedPage.toString()"
+            :min="0"
+            :max="pages.length - 1"
+          >
+          <span> of </span>
+          <span class="value">{{ pages.length }}</span>
+        </div>
+      </div>
+    </div>
 
     <div class="table">
       <div class="header">
@@ -210,7 +358,8 @@ onMounted(() => {
       </div>
 
       <div class="table-body">
-        <div v-for="(record, index) in tableRecords" class="row-wrapper">
+        <!--div v-for="(record, index) in tableRecords" class="row-wrapper"></div-->
+        <div v-for="(record, index) in viewRecords" class="row-wrapper">
           <AttendanceRow
             :index
             :selected="record.selected"
@@ -219,12 +368,51 @@ onMounted(() => {
             @toggle-selected="handleSelection"
           />
 
-          <div v-if="index != tableRecords.length - 1" class="separator"/>
+          <div v-if="index != viewRecords.length - 1" class="separator"/>
         </div>
       </div>
     </div>
 
-    <ToolBar/>
+
+    <div class="table-controllers">
+      <div class="left">
+        <span class="value">{{ recordsPerPage }}</span>
+        <span> results of </span>
+        <span class="value">{{ tableRecords.length }}</span>
+      </div>
+
+      <div class="right">
+        <div>
+          <span>elements per page </span>
+          <input
+            v-model="recordsPerPage"
+            type="number"
+            id="quantity"
+            name="quantity"
+            :placeholder="recordsPerPage.toString"
+            :min="1"
+            :max="tableRecords.length"
+          >
+        </div>
+
+        <div>
+          <span>page </span>
+          <input
+            v-model="selectedPage"
+            type="number"
+            id="quantity"
+            name="quantity"
+            :placeholder="selectedPage.toString()"
+            :min="0"
+            :max="pages.length - 1"
+          >
+          <span> of </span>
+          <span class="value">{{ pages.length }}</span>
+        </div>
+      </div>
+    </div>
+
+    <ToolBar v-if="selectedRecords.length > 0" :fields="tableRecords" :selected-fields="selectedRecords"/>
   </div>
 </template>
 
@@ -242,11 +430,11 @@ onMounted(() => {
 .bento {
   width: 100%;
 
-  //padding: 10px;
+  //padding: 14px;
 
   display: flex;
   flex-direction: column;
-  gap: 36px;
+  gap: 16px;
 
   border-radius: 24px;
   //background-color: rgba(230, 230, 230);
@@ -290,8 +478,14 @@ onMounted(() => {
     //overflow-x: scroll;
     width: 100%;
 
+    padding-top: 10px;
+
     .header {
       width: 100%;
+
+      padding-left: 4px;
+      padding-right: 4px;
+
       display: flex;
 
       input {
@@ -300,15 +494,14 @@ onMounted(() => {
 
       .column {
         width: 100%;
-        margin-right: 26px;
+        //margin-right: 26px;
 
         display: flex;
         justify-content: space-between;
         align-items: center;
 
         span {
-          font-family: 'Segoe UI', sans-serif;
-          font-size: 13px;
+          font-size: 14px;
           font-weight: 600;
           text-wrap: wrap;
         }
@@ -320,56 +513,66 @@ onMounted(() => {
     }
 
     .table-body {
+      padding-left: 4px;
+      padding-right: 4px;
       padding-top: 4px;
-      padding-bottom: 12px;
+      padding-bottom: 4px;
 
-      border-radius: 20px;
+      border-radius: 12px;
+
+      background-color: rgb(248, 248, 248);
       //background-color: rgba(255, 255, 255, 0.7);
       //background-color: rgba(245, 245, 245);
-      backdrop-filter: blur(30px);
+      //backdrop-filter: blur(30px);
 
       .row-wrapper {
         display: flex;
         flex-direction: column;
 
-        .row {
-          width: 100%;
-          display: flex;
-          align-items: center;
-
-          padding-top: 4px;
-          //padding-left: 12px;
-          //padding-right: 12px;
-          padding-bottom: 4px;
-
-          border-radius: 8px;
-
-          input {
-            margin-right: 16px;
-          }
-
-          .column {
-            width: 100%;
-            text-align: left;
-
-            span {
-              font-size: 13px;
-              text-wrap: wrap;
-            }
-          }
-
-          &:hover {
-            background-color: rgba(255, 255, 255, 0.9);
-          }
-        }
-
         .separator {
           width: 97%;
           height: 2px;
-          
+
           align-self: flex-end;
 
           background-color: rgb(245, 245, 245);
+        }
+      }
+    }
+  }
+
+  .table-controllers {
+    display: flex;
+    justify-content: space-between;
+
+    .left {
+      .value {
+        font-weight: 600;
+
+      }
+    }
+
+    .right {
+      display: flex;
+      gap: 30px;
+
+      div {
+        .value {
+          font-weight: 600;
+        }
+
+        input[type=number] {
+          //border: none;
+          padding-left: 2px;
+
+          //-moz-appearance: textfield;
+          //appearance: textfield;
+
+          &::-webkit-inner-spin-button,
+          ::-webkit-outer-spin-button {
+            -webkit-appearance: none; 
+            opacity: 0;
+          }
         }
       }
     }

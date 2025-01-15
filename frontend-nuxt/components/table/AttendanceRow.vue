@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { HrAttendance } from '~/hooks/hr';
 import IconMore from '../icons/IconMore.vue';
+import BadgeDynamic from '../badges/BadgeDynamic.vue';
 
 interface Props {
   index: number,
@@ -42,7 +43,7 @@ function formatTime(decimalTime: number) {
     </div>
 
     <div v-if="show[1]" class="column">
-      <span>{{record.employee_id[1]}}</span>
+      <span class="employee">{{record.employee_id[1]}}</span>
     </div>
 
     <div v-if="show[2]" class="column">
@@ -58,7 +59,8 @@ function formatTime(decimalTime: number) {
     </div>
 
     <div v-if="show[5]" class="column">
-      <span>{{record.check_out}}</span>
+      <span v-if="record.check_out">{{record.check_out}}</span>
+      <BadgeDynamic v-if="!record.check_out" name="still going" :color="{r: 243, g: 239, b: 251}"/>
     </div>
 
     <div v-if="show[6]" class="column">
@@ -85,10 +87,10 @@ function formatTime(decimalTime: number) {
   display: flex;
   align-items: center;
 
-  padding-top: 4px;
+  padding-top: 6px;
   //padding-left: 12px;
   //padding-right: 12px;
-  padding-bottom: 4px;
+  padding-bottom: 6px;
 
   border-radius: 8px;
 
@@ -99,6 +101,11 @@ function formatTime(decimalTime: number) {
   .column {
     width: 100%;
     text-align: left;
+
+    .employee {
+      color: rgb(0, 91, 91);
+      cursor: pointer;
+    }
 
     span {
       font-size: 14px;
@@ -118,7 +125,7 @@ function formatTime(decimalTime: number) {
 
     // Quando è hover e selected
     &:hover {
-      background-color: darkred;
+      background-color: rgb(226, 236, 255);
     }
   }
 

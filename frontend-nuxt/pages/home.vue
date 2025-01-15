@@ -1,18 +1,6 @@
 <script setup lang="ts">
-import BadgeModel from '~/components/badges/BadgeModel.vue';
-import ButtonDelete from '~/components/buttons/ButtonDelete.vue';
-import ButtonExport from '~/components/buttons/ButtonExport.vue';
-import IconChevron from '~/components/icons/IconChevron.vue';
-import IconUser from '~/components/icons/IconUser.vue';
-import AttendanceColumn from '~/components/table/AttendanceColumn.vue';
-import AttendanceRow from '~/components/table/AttendanceRow.vue';
-import type { HrAttendance } from '~/hooks/hr';
-import type { OdooField } from '~/hooks/odoo/fields';
-import type { OdooModelData } from '~/hooks/odoo/wrapper';
-import type { TableField } from '~/hooks/table';
-import Models from './models.vue';
-import FiltersTemplate from '~/components/FiltersTemplate.vue';
-import IconHexagon from '~/components/icons/shapes/IconHexagon.vue';
+import Header from '~/components/Header.vue';
+import type { OdooUserData } from '~/hooks/odoo/data';
 
 definePageMeta({
   middleware: 'auth',
@@ -24,11 +12,21 @@ definePageMeta({
   */
 });
 
+const userDataStore = useUserDataStore();
+const userData = ref<OdooUserData>();
+
 onMounted(async () => {
+  await userDataStore.init();
+  userData.value = userDataStore.userData;
+
+  console.log('Home | userData');
+  console.log(userData.value);
 })
 </script>
 
 <template>
+  <div class="site">
+  <Header :userData/>
   <div class="global">
     <SideMenu/>
 
@@ -53,6 +51,7 @@ onMounted(async () => {
       </div>
     </div-->
   </div>
+</div>
 </template>
 
 <style scoped lang="scss">
@@ -61,17 +60,28 @@ onMounted(async () => {
   gap: 30px;
 }
 
+.site {
+  padding-top: 20px;
+  //padding-bottom: 20px;
+  padding-left: 20px;
+  padding-right: 20px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
 .global {
   display: flex;
 
-  width: 100%;
+  //width: 100%;
   height: 100%;
 
-  padding-top: 20px;
-  padding-bottom: 20px;
+  //padding-top: 20px;
+  //padding-right: 20px;
 
   .body {
-    width: 100%;
+    //width: 100%;
     height: 100%;
 
     display: flex;

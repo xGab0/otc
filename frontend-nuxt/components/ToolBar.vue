@@ -1,13 +1,22 @@
 <script setup lang="ts">
+import type { TableField } from '~/hooks/table';
 import IconExport from './icons/IconExport.vue';
 import IconTrash from './icons/IconTrash.vue';
+import type { HrAttendance } from '~/hooks/hr';
+
+interface Props {
+  fields: TableField<HrAttendance>[];
+  selectedFields: TableField<HrAttendance>[];
+}
+
+const { selectedFields } = defineProps<Props>();
 
 </script>
 
 <template>
   <div class="toolbar">
     <div class="element">
-      <span>3 of 200 selected</span>
+      <span>{{ selectedFields.length }} of {{ fields.length }} selected</span>
     </div>
 
     <div class="element">
