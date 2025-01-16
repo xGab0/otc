@@ -25,7 +25,7 @@ const DEBUG: boolean = false;
 
 export type ServerVersionInfo = [number, number, number, string, number, string];
 export type OdooRecordSyntax = { [key: string]: any };
-export type LogicType = '>=' | '<=' | '=' | '!=' | 'ilike';
+export type LogicType = '>=' | '<=' | '==' | '!=' | 'ilike';
 export type LogicFilter = [string, LogicType, any];
 export type FieldsFilter = string[] | ['*'];
 export type OdooUid = {

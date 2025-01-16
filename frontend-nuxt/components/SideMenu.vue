@@ -2,6 +2,7 @@
 import IconUser from './icons/IconUser.vue';
 import LogoPrometika from './icons/LogoPrometika.vue';
 import IconRhombus from './icons/shapes/IconRhombus.vue';
+import LogoPrometikaSlogan from './logos/LogoPrometikaSlogan.vue';
 
 const authStore = useAuthStore();
 
@@ -27,6 +28,11 @@ onMounted(async () => {
 
 <template>
   <div class="sidebar">
+    <!--div class="logo">
+      <LogoPrometika/>
+      <LogoPrometikaSlogan/>
+    </div-->
+
     <div class="section">
       <!--LogoPrometika/-->
 
@@ -90,13 +96,21 @@ onMounted(async () => {
 
 <style scoped lang="scss">
 .sidebar {
-  margin-right: 24px;
-  padding-left: 50px;
-  padding-right: 50px;
+  width: 12%;
+  //margin-right: 24px;
+  //padding-left: 50px;
+  //padding-right: 50px;
 
   display: flex;
   flex-direction: column;
   gap: 100px;
+
+  .logo {
+    height: 50px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
 
   .section {
     display: flex;

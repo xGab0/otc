@@ -31,8 +31,13 @@ onMounted(() => {
 
 <style lang="scss" scoped>
 .header {
+  padding: 12px;
+
   display: flex;
   justify-content: space-between;
+
+  border-radius: 16px;
+  background-color: white;
 
   .logo {
     height: 50px;

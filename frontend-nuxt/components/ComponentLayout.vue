@@ -4,6 +4,7 @@ import IconHexagon from './icons/shapes/IconHexagon.vue';
 import Models from '~/pages/models.vue';
 import type { OdooModelData } from '~/hooks/odoo/data';
 import IconGrid from './icons/IconGrid.vue';
+import RecordCreator from './RecordCreator.vue';
 
 definePageMeta({
   middleware: 'auth'
@@ -12,6 +13,7 @@ definePageMeta({
 const authStore = useAuthStore();
 
 const model = ref<OdooModelData>();
+const fields = ref();
 const records = ref<HrAttendance[]>();
 const viewedRecord = ref<HrAttendance>();
 
@@ -20,6 +22,7 @@ onMounted(async () => {
 
   const queryBuilder = authStore.odooUser!.modelQueryBuilder<HrAttendance>('hr.attendance');
   model.value = (await queryBuilder.searchData())[0];
+  fields.value = await queryBuilder.searchFieldTypes();
   records.value = await queryBuilder.searchReadRecords();
   viewedRecord.value = records.value[0];
 
@@ -27,6 +30,9 @@ onMounted(async () => {
 
   console.debug('ComponentLayout | modeldata');
   console.debug(model.value);
+
+  console.debug('ComponentLayout | fieldTypes');
+  console.debug(fields.value);
 
   console.debug('ComponentLayout | records');
   console.debug(records.value);
@@ -66,8 +72,12 @@ onMounted(async () => {
         <Models :records="records"/>
       </div>
 
+      <div class="container">
+        <RecordCreator :fields="Object.entries(fields)"/>
+      </div>
+
       <!--div class="container">
-        <QueryBuilder/><
+        <QueryBuilder/>
       </div-->
 
       <!--div class="container">
@@ -163,7 +173,7 @@ onMounted(async () => {
     height: 100%;
 
     display: grid;
-    grid-template-columns: repeat(1, auto);
+    grid-template-columns: repeat(2, auto);
     gap: 14px;
 
     .container {

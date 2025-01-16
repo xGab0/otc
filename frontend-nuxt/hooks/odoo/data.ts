@@ -1,6 +1,6 @@
-import type { OdooRecordSyntax } from "./wrapper";
+import type { OdooRecord, OdooRecordSyntax } from "./wrapper";
 
-export interface OdooUserData extends OdooRecordSyntax {
+export interface OdooUserData extends OdooRecordSyntax, OdooRecord {
   id: number,
   name: string,
   display_name: string,

@@ -5,7 +5,7 @@ useHead({
     class: 'html'
   },
   bodyAttrs: {
-    class: 'main-body paper-squared'
+    class: 'main-body'
   }
 })
 </script>
@@ -51,7 +51,7 @@ span {
 }
 
 .paper-squared {
-  background-image: 
+  background-image:
     linear-gradient(90deg, #f0efef 1px, transparent 1px),  /* Linee verticali */
     linear-gradient(0deg, #f0efef 1px, transparent 1px);  /* Linee orizzontali */
   background-size: 20px 20px;  /* Imposta la dimensione della griglia (es. 20x20px per quadretti piccoli) */

@@ -23,7 +23,9 @@ department_id: {
 
 */
 
-export interface OdooField {
+export type OdooField = [string, OdooFieldData];
+
+export interface OdooFieldData {
   type: string,
   name: string,
   string: string,
@@ -36,29 +38,29 @@ export interface OdooField {
   sortable: boolean
 }
 
-export interface CharField extends OdooField {
+export interface CharField extends OdooFieldData {
   type: 'char'
 }
 
-export interface IntegerField extends OdooField {
+export interface IntegerField extends OdooFieldData {
   type: 'integer'
 }
 
-export interface FloatField extends OdooField {
+export interface FloatField extends OdooFieldData {
   type: 'float'
 }
 
-export interface DateTimeField extends OdooField {
+export interface DateTimeField extends OdooFieldData {
   type: 'datetime'
 }
 
-export interface Many2OneField extends OdooField {
+export interface Many2OneField extends OdooFieldData {
   type: 'many2one',
   relation: string, // res.users
   domain: string,
 }
 
-export interface One2ManyField extends OdooField {
+export interface One2ManyField extends OdooFieldData {
   type: 'one2many',
   domain: string,
 }

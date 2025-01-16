@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import Papa from 'papaparse';
 import BadgeModel from '~/components/badges/BadgeModel.vue';
+import ButtonCreate from '~/components/buttons/ButtonCreate.vue';
 import ButtonDelete from '~/components/buttons/ButtonDelete.vue';
 import ButtonExport from '~/components/buttons/ButtonExport.vue';
 import ButtonFilters from '~/components/buttons/ButtonFilters.vue';
@@ -245,6 +246,8 @@ onMounted(() => {
   <div v-if="loaded" class="bento">
     <div class="header">
       <div>
+        <ButtonCreate/>
+        <ButtonExport/>
         <ButtonFilters/>
 
         <!--span>records length: {{ tableRecords.length }}</span>
@@ -255,8 +258,9 @@ onMounted(() => {
         <span> | </span>
         <span>selected page: {{ selectedPage }}</span-->
       </div>
-      <div>
+      <div class="search-wrapper">
         <input type="search" placeholder="search elements"/>
+        <IconsIconSearch/>
       </div>
     </div>
     <!--div class="test">
@@ -268,44 +272,6 @@ onMounted(() => {
         <AttendanceColumn name="Work Hours" :data="workedHours"/>
       </div>
     </div-->
-
-    <div class="table-controllers">
-      <div class="left">
-        <span class="value">{{ recordsPerPage }}</span>
-        <span> results of </span>
-        <span class="value">{{ tableRecords.length }}</span>
-      </div>
-
-      <div class="right">
-        <div>
-          <span>elements per page </span>
-          <input
-            v-model="recordsPerPage"
-            type="number"
-            id="quantity"
-            name="quantity"
-            :placeholder="recordsPerPage.toString"
-            :min="1"
-            :max="tableRecords.length"
-          >
-        </div>
-
-        <div>
-          <span>page </span>
-          <input
-            v-model="selectedPage"
-            type="number"
-            id="quantity"
-            name="quantity"
-            :placeholder="selectedPage.toString()"
-            :min="0"
-            :max="pages.length - 1"
-          >
-          <span> of </span>
-          <span class="value">{{ pages.length }}</span>
-        </div>
-      </div>
-    </div>
 
     <div class="table">
       <div class="header">
@@ -453,6 +419,19 @@ onMounted(() => {
     display: grid;
     grid-template-columns: auto auto;
 
+    .search-wrapper {
+      display: flex;
+      align-items: center;
+
+      padding-left: 8px;
+      padding-right: 8px;
+
+      border-radius: 8px;
+      outline: none;
+      border: none;
+      background-color: rgb(245, 245, 245);
+    }
+
     div {
       &:nth-child(1) {
         display: flex;
@@ -463,12 +442,10 @@ onMounted(() => {
         justify-content: flex-end;
 
         input {
-          padding-left: 8px;
-
-          border-radius: 8px;
+          width: 100%;
           outline: none;
           border: none;
-          background-color: rgb(245, 245, 245);
+          background: none;
         }
       }
     }
