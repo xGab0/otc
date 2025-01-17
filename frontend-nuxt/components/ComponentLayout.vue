@@ -17,6 +17,10 @@ const fields = ref();
 const records = ref<HrAttendance[]>();
 const viewedRecord = ref<HrAttendance>();
 
+const showMenuRecordsList = ref<boolean>(false);
+const showMenuRecordsCreate = ref<boolean>(false);
+const showMenuRecordInfo = ref<boolean>(false);
+
 onMounted(async () => {
   //records.value = await authStore.odooUser!.searchRecords('hr.attendance');
 
@@ -26,7 +30,7 @@ onMounted(async () => {
   records.value = await queryBuilder.searchReadRecords();
   viewedRecord.value = records.value[0];
 
-  const perms = await authStore.odooUser!.searchReadRecord('ir.model.access', [['model_id.model', '=', 'hr.attendance']], [], undefined, 1);
+  const perms = await authStore.odooUser!.searchReadRecord('ir.model.access', [['model_id.model', '==', 'hr.attendance']], [], undefined, 1);
 
   console.debug('ComponentLayout | modeldata');
   console.debug(model.value);
@@ -69,10 +73,10 @@ onMounted(async () => {
 
     <div class="workspace">
       <div class="container">
-        <Models :records="records"/>
+        <Models :records="records" @open-menu="() => { showMenuRecordsCreate = true }" @close-menu="() => { showMenuRecordsCreate = false }"/>
       </div>
 
-      <div class="container">
+      <div v-if="showMenuRecordsCreate" class="container">
         <RecordCreator :fields="Object.entries(fields)"/>
       </div>
 
@@ -80,9 +84,9 @@ onMounted(async () => {
         <QueryBuilder/>
       </div-->
 
-      <!--div class="container">
-        <RecordDetails v-if="viewedRecord" :record="viewedRecord"/>
-      </div-->
+      <div v-if="showMenuRecordInfo" class="container">
+        <RecordInfo v-if="viewedRecord" :record="viewedRecord"/>
+      </div>
     </div>
   </div>
 </template>
@@ -174,6 +178,8 @@ onMounted(async () => {
 
     display: grid;
     grid-template-columns: repeat(2, auto);
+    //grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    //grid-template-columns: repeat(auto-fill, 1fr);
     gap: 14px;
 
     .container {

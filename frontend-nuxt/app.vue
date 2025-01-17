@@ -14,8 +14,11 @@ useHead({
   <NuxtPage/>
 </template>
 
-<style>
+<style lang="scss">
 .html {
+  --font-geist-mono: 'GiestMono',
+  --font-geist-sans: 'GeistSans'
+
   /*
   height: 100vh;
 
@@ -32,6 +35,9 @@ useHead({
 .main-body {
   margin: 0;
   padding: 0;
+
+  font-synthesis-weight: none;
+  text-rendering: optimizeLegibility;
 
   background-color: rgb(246, 246, 246);
 
@@ -58,4 +64,69 @@ span {
   background-position: 0 0;  /* Posizione di partenza */
   background-repeat: repeat;  /* Ripetizione del pattern */
 }
+
+/*
+.text-xs {
+  line-height: 1.25rem;
+  font-size: .875rem;
+  color: hsl(var(--muted-foreground));
+}
+
+.text-sm {
+  line-height: 1.25rem;
+  font-size: .875rem;
+  color: hsl(var(--muted-foreground));
+}
+
+.text-base {
+  line-height: 1.25rem;
+  font-size: .875rem;
+  color: hsl(var(--muted-foreground));
+}
+
+.text-lg {
+  line-height: 1.55rem;
+  font-size: 1.275rem;
+  font-weight: 500;
+}
+
+.text-xl {
+  line-height: 1.55rem;
+  font-size: 1.775rem;
+  font-weight: 600;
+}
+
+.text-2xl {
+  line-height: 2.55rem;
+  font-size: 2.075rem;
+  font-weight: 700;
+}
+
+.text-3xl {
+  line-height: 1.55rem;
+  font-size: 1.875rem;
+  font-weight: 800;
+  color: hsl(var(--muted-foreground));
+}
+
+.text-4xl {
+  line-height: 1.55rem;
+  font-size: 1.875rem;
+  font-weight: 900;
+  color: hsl(var(--muted-foreground));
+}
+*/
+
+/*
+.card {
+  &.title {
+    @apply text-lg;
+  }
+
+  &.description {
+    @apply text-base;
+    color: rgb(113, 113, 113);
+  }
+}
+*/
 </style>

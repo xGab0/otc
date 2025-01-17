@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import Papa from 'papaparse';
+import BadgeDynamic from '~/components/badges/BadgeDynamic.vue';
 import BadgeModel from '~/components/badges/BadgeModel.vue';
 import ButtonCreate from '~/components/buttons/ButtonCreate.vue';
 import ButtonDelete from '~/components/buttons/ButtonDelete.vue';
@@ -31,6 +32,12 @@ interface Page {
 
 const { records } = defineProps<{records: HrAttendance[]}>();
 
+const emit = defineEmits<{
+  openMenu: [menuName: string]
+  closeMenu: [menuName: string]
+}>()
+
+
 const authStore = useAuthStore();
 //const model = ref<OdooModelData>();
 //const fields = ref<OdooField[]>();
@@ -59,6 +66,16 @@ const showCheckOuts = ref<boolean>(true);
 const showCheckOutsLat = ref<boolean>(false);
 const showCheckOutsLon = ref<boolean>(false);
 const showWorkedHours = ref<boolean>(true);
+
+const sortIds = ref<boolean>(false);
+const sortEmployeers = ref<boolean>(true);
+const sortCheckIns = ref<boolean>(true);
+const sortCheckInsLat = ref<boolean>(false);
+const sortCheckInsLon = ref<boolean>(false);
+const sortCheckOuts = ref<boolean>(true);
+const sortCheckOutsLat = ref<boolean>(false);
+const sortCheckOutsLon = ref<boolean>(false);
+const sortWorkedHours = ref<boolean>(true);
 
 watch([tableRecords, recordsPerPage], () => {
   pages.value = getPageIndexes(tableRecords.value.length, recordsPerPage.value);
@@ -244,9 +261,14 @@ onMounted(() => {
 
 <template>
   <div v-if="loaded" class="bento">
+    <div class="flex flex-col">
+      <span class="text-2xl font-bold">Records list</span>
+      <span class="text-normal text-gray-600 font-normal">View and modify the records for this model</span>
+    </div>
+
     <div class="header">
       <div>
-        <ButtonCreate/>
+        <ButtonCreate @mousedown="() => { emit('openMenu', 'create-record') }"/>
         <ButtonExport/>
         <ButtonFilters/>
 
@@ -259,6 +281,7 @@ onMounted(() => {
         <span>selected page: {{ selectedPage }}</span-->
       </div>
       <div class="search-wrapper">
+        <BadgeDynamic name="Employee" :color="{ r: 250, g: 240, b: 230}"/>
         <input type="search" placeholder="search elements"/>
         <IconsIconSearch/>
       </div>
@@ -279,47 +302,56 @@ onMounted(() => {
 
         <div v-if="showIds" class="column">
           <span>Id</span>
-          <IconChevron @click="() => { }"/>
+          <IconsIconSortAz @click="() => { }"/>
         </div>
 
         <div v-if="showEmployeers" class="column">
           <span>Employee</span>
-          <IconChevron @click="() => { sortAlpha() }"/>
+          <IconsIconSort :inverse="sortEmployeers" @click="() => { 
+            if (sortEmployeers) {
+              sortAlpha();
+              sortEmployeers = false;
+            } else {
+              sortAlphaInverse();
+              sortEmployeers = true;
+            }
+          }"/>
+          <!--IconsIconSortAz @click="() => { sortAlpha() }"/-->
         </div>
 
         <div v-if="showCheckIns" class="column">
           <span>Check In</span>
-          <IconChevron @click="() => { sortCheckin() }"/>
+          <IconsIconSortAz @click="() => { sortCheckin() }"/>
         </div>
 
         <div v-if="showCheckInsLat" class="column">
           <span>Check In Latitude</span>
-          <IconChevron @click="() => { sortCheckin() }"/>
+          <IconsIconSortAz @click="() => { sortCheckin() }"/>
         </div>
 
         <div v-if="showCheckInsLon" class="column">
           <span>Check In Longitude</span>
-          <IconChevron @click="() => { sortCheckin() }"/>
+          <IconsIconSortAz @click="() => { sortCheckin() }"/>
         </div>
 
         <div v-if="showCheckOuts" class="column">
           <span>Check Out</span>
-          <IconChevron/>
+          <IconsIconSortAz/>
         </div>
 
         <div v-if="showCheckOutsLat" class="column">
           <span>Check Out Latitude</span>
-          <IconChevron @click="() => { sortCheckin() }"/>
+          <IconsIconSortAz @click="() => { sortCheckin() }"/>
         </div>
 
         <div v-if="showCheckOutsLon" class="column">
           <span>Check Out Longitude</span>
-          <IconChevron @click="() => { sortCheckin() }"/>
+          <IconsIconSortAz @click="() => { sortCheckin() }"/>
         </div>
 
         <div v-if="showWorkedHours" class="column">
           <span>Work Hours</span>
-          <IconChevron @click="() => { sortNumber() }"/>
+          <IconsIconSortAz @click="() => { sortNumber() }"/>
         </div>
       </div>
 
@@ -373,7 +405,7 @@ onMounted(() => {
             :max="pages.length - 1"
           >
           <span> of </span>
-          <span class="value">{{ pages.length }}</span>
+          <span class="value">{{ pages.length - 1 }}</span>
         </div>
       </div>
     </div>
@@ -422,6 +454,7 @@ onMounted(() => {
     .search-wrapper {
       display: flex;
       align-items: center;
+      gap: 4px;
 
       padding-left: 8px;
       padding-right: 8px;
@@ -460,8 +493,9 @@ onMounted(() => {
     .header {
       width: 100%;
 
-      padding-left: 4px;
-      padding-right: 4px;
+      padding-left: .35rem;
+      padding-right: .35rem;
+      padding-bottom: .35rem;
 
       display: flex;
 
@@ -474,8 +508,9 @@ onMounted(() => {
         //margin-right: 26px;
 
         display: flex;
-        justify-content: space-between;
+        justify-content: left;
         align-items: center;
+        gap: 2px;
 
         span {
           font-size: 14px;
@@ -490,10 +525,11 @@ onMounted(() => {
     }
 
     .table-body {
-      padding-left: 4px;
-      padding-right: 4px;
-      padding-top: 4px;
-      padding-bottom: 4px;
+      padding-left: .35rem;
+      padding-right: .35rem;
+
+      padding-top: .40rem;
+      padding-bottom: .40rem;
 
       border-radius: 12px;
 
@@ -539,8 +575,15 @@ onMounted(() => {
         }
 
         input[type=number] {
-          //border: none;
-          padding-left: 2px;
+          padding-top: .25rem;
+          padding-bottom: .25rem;
+          padding-left: .75rem;
+
+          border: solid 1px hsl(240 5.9% 90%);
+          border-radius: 0.4rem;
+          box-shadow: 0 1px 2px 0 rgba(0,0,0,.05);
+
+          outline: none;
 
           //-moz-appearance: textfield;
           //appearance: textfield;

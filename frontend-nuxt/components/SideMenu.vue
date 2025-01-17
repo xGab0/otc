@@ -4,11 +4,14 @@ import LogoPrometika from './icons/LogoPrometika.vue';
 import IconRhombus from './icons/shapes/IconRhombus.vue';
 import LogoPrometikaSlogan from './logos/LogoPrometikaSlogan.vue';
 
+const router = useRouter();
 const authStore = useAuthStore();
 
 const users = ref();
 const models = ref();
 const views = ref();
+
+// router.currentRoute.value.name
 
 onMounted(async () => {
   users.value = await authStore.odooUser!.searchReadRecord('res.users');
@@ -41,18 +44,25 @@ onMounted(async () => {
       </div>
 
       <div class="body">
-        <div class="element">
+        <div class="element" :class="{ 'selected': router.currentRoute.value.path === '/home'}">
+          <IconUser/>
+          <span>home</span>
+          <!--span v-for="user in users">{{ user.display_name }}</span-->
+        </div>
+
+
+        <div class="element" :class="{ 'selected': router.currentRoute.value.path === '/users'}">
           <IconUser/>
           <span>utenti</span>
           <!--span v-for="user in users">{{ user.display_name }}</span-->
         </div>
 
-        <div class="element">
+        <div class="element" :class="{ 'selected': router.currentRoute.value.path === '/models'}">
           <IconUser/>
           <span>modelli</span>
         </div>
 
-        <div class="element">
+        <div class="element" :class="{ 'selected': router.currentRoute.value.path === '/models'}">
           <IconUser/>
           <span>presenze</span>
         </div>
@@ -140,6 +150,10 @@ onMounted(async () => {
         display: flex;
         align-items: center;
         gap: 6px;
+
+        &.selected {
+          background-color: aqua;
+        }
 
         svg {
           width: 16px;

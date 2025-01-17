@@ -25,7 +25,7 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div>
+  <div class="dropdown radio users">
     <DropdownRadio
       v-if="users"
       :elements="users"
@@ -37,7 +37,15 @@ onMounted(async () => {
 </template>
 
 <style lang="scss" scoped>
-.dropdown.radio {
+.dropdown.radio.users {
+  &.radio {
+    &.users {
+      padding: 8px;
+      border-radius: 8px;
 
+      border: solid 1px rgb(224, 224, 224);
+      box-shadow: rgba(0, 0, 0, 0.04) 0px 3px 5px;
+    }
+  }
 }
 </style>

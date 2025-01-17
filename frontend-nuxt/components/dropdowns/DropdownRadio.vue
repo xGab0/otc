@@ -88,9 +88,6 @@ onUnmounted(() => {
 <style lang="scss" scoped>
 .jesus {
   position: relative;
-
-  border: solid 1px hsl(240, 5.9%, 90%);
-  box-shadow: 1px 1px 1px #0000;
 }
 .dropdown.radio {
   position: absolute;
