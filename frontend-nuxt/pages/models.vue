@@ -10,10 +10,12 @@ import IconChevron from '~/components/icons/IconChevron.vue';
 import AttendanceColumn from '~/components/table/AttendanceColumn.vue';
 import AttendanceRow from '~/components/table/AttendanceRow.vue';
 import CheckboxesColumn from '~/components/table/CheckboxesColumn.vue';
+import CreatingRow from '~/components/table/CreatingRow.vue';
 import type { HrAttendance } from '~/hooks/hr';
 import type { OdooField } from '~/hooks/odoo/fields';
-import type { OdooModelData } from '~/hooks/odoo/wrapper';
+import type { OdooModelData, OdooRecordSyntax } from '~/hooks/odoo/wrapper';
 import type { TableField } from '~/hooks/table';
+import LayoutCollapsable from '~/layouts/LayoutCollapsable.vue';
 
 definePageMeta({
   middleware: 'auth',
@@ -30,11 +32,16 @@ interface Page {
   to: number
 }
 
-const { records } = defineProps<{records: HrAttendance[]}>();
+const { records, isCreationOpen, creatingRecord } = defineProps<{
+  records: HrAttendance[],
+  isCreationOpen: boolean,
+  creatingRecord: OdooRecordSyntax | undefined
+}>();
 
 const emit = defineEmits<{
   openMenu: [menuName: string]
   closeMenu: [menuName: string]
+  openMenuDetails: [record: HrAttendance, index: number]
 }>()
 
 
@@ -42,7 +49,11 @@ const authStore = useAuthStore();
 //const model = ref<OdooModelData>();
 //const fields = ref<OdooField[]>();
 
-const tableRecords = ref<TableField<HrAttendance>[]>([]);  // Dati completi
+const newTableRecords = computed<TableField<HrAttendance>[]>(() => {
+  return records.map(record => { return { selected: false, record: record }});
+})
+
+//const tableRecords = ref<TableField<HrAttendance>[]>([]);  // Dati completi
 const recordsPerPage = ref<number>(10);  // Numero di record per pagina
 const selectedPage = ref<number>(0);   // Pagina selezionata
 const pages = ref<Page[]>([]);  // Indici delle pagine
@@ -77,18 +88,18 @@ const sortCheckOutsLat = ref<boolean>(false);
 const sortCheckOutsLon = ref<boolean>(false);
 const sortWorkedHours = ref<boolean>(true);
 
-watch([tableRecords, recordsPerPage], () => {
-  pages.value = getPageIndexes(tableRecords.value.length, recordsPerPage.value);
+watch([newTableRecords, recordsPerPage], () => {
+  pages.value = getPageIndexes(newTableRecords.value.length, recordsPerPage.value);
 });
 
 // Riferimento per i record da visualizzare
 const viewRecords = computed(() => {
   // Calcola l'indice iniziale e finale in base alla pagina selezionata
   const from = selectedPage.value * recordsPerPage.value;
-  const to = Math.min((selectedPage.value + 1) * recordsPerPage.value, tableRecords.value.length);
+  const to = Math.min((selectedPage.value + 1) * recordsPerPage.value, newTableRecords.value.length);
 
   // Restituisce i record da visualizzare
-  return tableRecords.value.slice(from, to);
+  return newTableRecords.value.slice(from, to);
 });
 
 function getPageIndexes(totalRecords: number, recordsPerPage: number): { from: number, to: number }[] {
@@ -153,7 +164,7 @@ function downloadSelectedRecords() {
 }
 
 const sortAlpha = () => {
-  tableRecords.value.sort((a, b) => {
+  newTableRecords.value.sort((a, b) => {
     return a.record.employee_id[1].localeCompare(b.record.employee_id[1]);
   });
 
@@ -161,7 +172,7 @@ const sortAlpha = () => {
 }
 
 const sortAlphaInverse = () => {
-  tableRecords.value.sort((a, b) => {
+  newTableRecords.value.sort((a, b) => {
     return b.record.employee_id[1].localeCompare(a.record.employee_id[1]);
   });
 
@@ -169,7 +180,7 @@ const sortAlphaInverse = () => {
 }
 
 const sortCheckin = () => {
-  tableRecords.value.sort((a, b) => {
+  newTableRecords.value.sort((a, b) => {
     const dateA = new Date(a.record.check_in);  // Converti la data in oggetto Date
     const dateB = new Date(b.record.check_in);
     return dateA - dateB;  // Ordina per millisecondi
@@ -179,7 +190,7 @@ const sortCheckin = () => {
 }
 
 const sortCheckinInverse = () => {
-  tableRecords.value.sort((a, b) => {
+  newTableRecords.value.sort((a, b) => {
     const dateA = new Date(a.record.check_in);
     const dateB = new Date(b.record.check_in);
     return dateB - dateA;  // Ordina per millisecondi, invertito per decrescente
@@ -190,7 +201,7 @@ const sortCheckinInverse = () => {
 
 
 const sortNumber = () => {
-  tableRecords.value.sort((a, b) => {
+  newTableRecords.value.sort((a, b) => {
     return a.record.worked_hours - b.record.worked_hours;
   });
 
@@ -198,7 +209,7 @@ const sortNumber = () => {
 }
 
 const sortNumberInverse = () => {
-  tableRecords.value.sort((a, b) => {
+  newTableRecords.value.sort((a, b) => {
     return b.record.worked_hours - a.record.worked_hours;
   });
 
@@ -207,7 +218,7 @@ const sortNumberInverse = () => {
 }
 
 function handleSelection(index: number, selected: boolean) {
-  const tableRecord = tableRecords.value[index];
+  const tableRecord = newTableRecords.value[index];
   tableRecord.selected = selected;
 
   if (selected) {
@@ -222,7 +233,7 @@ function handleSelection(index: number, selected: boolean) {
 function toggleAllSelections() {
   const selected = allSelected.value = !allSelected.value;
 
-  tableRecords.value.forEach(record => {
+  newTableRecords.value.forEach(record => {
     record.selected = selected;
 
     if (selected) {
@@ -240,22 +251,28 @@ onMounted(() => {
   console.log('records');
   console.log(records);
 
-  tableRecords.value = records.map(record => { return { selected: false, record: record }});
+  //tableRecords.value = records.map(record => { return { selected: false, record: record }});
 
   console.log('tableRecords');
-  console.log(tableRecords.value);
+  console.log(newTableRecords.value);
 
-  employeers.value = tableRecords.value.map(value => value.record.employee_id[1]);
-  checkIns.value = tableRecords.value.map(value => value.record.check_in);
-  checkOuts.value = tableRecords.value.map(value => value.record.check_out);
-  workedHours.value = tableRecords.value.map(value => value.record.worked_hours);
+  employeers.value = newTableRecords.value.map(value => value.record.employee_id[1]);
+  checkIns.value = newTableRecords.value.map(value => value.record.check_in);
+  checkOuts.value = newTableRecords.value.map(value => value.record.check_out);
+  workedHours.value = newTableRecords.value.map(value => value.record.worked_hours);
 
   console.log('employers');
   console.log(employeers.value);
 
-  pages.value = getPageIndexes(tableRecords.value.length, recordsPerPage.value)
+  pages.value = getPageIndexes(newTableRecords.value.length, recordsPerPage.value)
 
   loaded.value = true;
+
+  console.log(`
+    Models | onMounted
+    - isCreationOpen: ${isCreationOpen}
+    - creatingRecord: ${creatingRecord}
+  `);
 })
 </script>
 
@@ -355,9 +372,44 @@ onMounted(() => {
         </div>
       </div>
 
-      <div class="table-body">
-        <!--div v-for="(record, index) in tableRecords" class="row-wrapper"></div-->
-        <div v-for="(record, index) in viewRecords" class="row-wrapper">
+      <LayoutCollapsable class="table-body" :collapsed="true">
+        <div class="row-wrapper fadeInUp-item" v-if="isCreationOpen && creatingRecord">
+          <CreatingRow
+            :record="creatingRecord"
+            :show="[showIds, showEmployeers, showCheckIns, showCheckInsLat, showCheckInsLon, showCheckOuts, showCheckOutsLat, showCheckOutsLon, showWorkedHours]"
+          />
+        </div>
+
+        <div 
+          v-for="(record, index) in viewRecords"
+          :style="{ animationDelay: `${index * 50}ms`}"
+          class="row-wrapper fadeInUp-item "
+        >
+          <AttendanceRow
+            :index
+            :selected="record.selected"
+            :record="record.record"
+            :show="[showIds, showEmployeers, showCheckIns, showCheckInsLat, showCheckInsLon, showCheckOuts, showCheckOutsLat, showCheckOutsLon, showWorkedHours]"
+            @toggle-selected="handleSelection"
+            @mousedown="() => emit('openMenuDetails', record.record, index)"
+          />
+
+          <div v-if="index != viewRecords.length - 1" class="separator"/>
+        </div>
+      </LayoutCollapsable>
+      <!--div class="table-body">
+        <div class="row-wrapper fadeInUp-item" v-if="isCreationOpen && creatingRecord">
+          <CreatingRow
+            :record="creatingRecord"
+            :show="[showIds, showEmployeers, showCheckIns, showCheckInsLat, showCheckInsLon, showCheckOuts, showCheckOutsLat, showCheckOutsLon, showWorkedHours]"
+          />
+        </div>
+
+        <div 
+          v-for="(record, index) in viewRecords"
+          :style="{ animationDelay: `${index * 50}ms`}"
+          class="row-wrapper fadeInUp-item "
+        >
           <AttendanceRow
             :index
             :selected="record.selected"
@@ -368,7 +420,7 @@ onMounted(() => {
 
           <div v-if="index != viewRecords.length - 1" class="separator"/>
         </div>
-      </div>
+      </div-->
     </div>
 
 
@@ -376,7 +428,7 @@ onMounted(() => {
       <div class="left">
         <span class="value">{{ recordsPerPage }}</span>
         <span> results of </span>
-        <span class="value">{{ tableRecords.length }}</span>
+        <span class="value">{{ newTableRecords.length }}</span>
       </div>
 
       <div class="right">
@@ -389,7 +441,7 @@ onMounted(() => {
             name="quantity"
             :placeholder="recordsPerPage.toString"
             :min="1"
-            :max="tableRecords.length"
+            :max="newTableRecords.length"
           >
         </div>
 
@@ -410,7 +462,7 @@ onMounted(() => {
       </div>
     </div>
 
-    <ToolBar v-if="selectedRecords.length > 0" :fields="tableRecords" :selected-fields="selectedRecords"/>
+    <ToolBar v-if="selectedRecords.length > 0" :fields="newTableRecords" :selected-fields="selectedRecords"/>
   </div>
 </template>
 
@@ -525,15 +577,20 @@ onMounted(() => {
     }
 
     .table-body {
+      /*
       padding-left: .35rem;
       padding-right: .35rem;
 
       padding-top: .40rem;
       padding-bottom: .40rem;
+      */
 
       border-radius: 12px;
 
-      background-color: rgb(248, 248, 248);
+      background-color: rgb(255, 255, 255);
+      box-shadow: rgba(0, 0, 0, 0.04) 0px 2px 4px,
+      rgba(0, 0, 0, 0.04) 0px -2px 4px;
+
       //background-color: rgba(255, 255, 255, 0.7);
       //background-color: rgba(245, 245, 245);
       //backdrop-filter: blur(30px);
@@ -541,6 +598,8 @@ onMounted(() => {
       .row-wrapper {
         display: flex;
         flex-direction: column;
+
+        opacity: 0;
 
         .separator {
           width: 97%;
@@ -596,6 +655,21 @@ onMounted(() => {
         }
       }
     }
+  }
+
+  @keyframes fadeInUp {
+    from {
+      transform: translateY(-10px);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+
+  .fadeInUp-item {
+    animation: 1.5s fadeInUp forwards;
   }
 }
 </style>

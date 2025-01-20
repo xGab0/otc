@@ -5,6 +5,9 @@ import Models from '~/pages/models.vue';
 import type { OdooModelData } from '~/hooks/odoo/data';
 import IconGrid from './icons/IconGrid.vue';
 import RecordCreator from './RecordCreator.vue';
+import { OdooRecordSyntax, type ModelQueryBuilder } from '~/hooks/odoo/wrapper';
+import LayoutCollapsable from '~/layouts/LayoutCollapsable.vue';
+import RecordDetails from './RecordDetails.vue';
 
 definePageMeta({
   middleware: 'auth'
@@ -14,6 +17,7 @@ const authStore = useAuthStore();
 
 const model = ref<OdooModelData>();
 const fields = ref();
+const queryBuilder = ref<ModelQueryBuilder<HrAttendance>>();
 const records = ref<HrAttendance[]>();
 const viewedRecord = ref<HrAttendance>();
 
@@ -21,13 +25,23 @@ const showMenuRecordsList = ref<boolean>(false);
 const showMenuRecordsCreate = ref<boolean>(false);
 const showMenuRecordInfo = ref<boolean>(false);
 
+const show = ref<boolean>(true);
+const childRef = ref<InstanceType<typeof RecordCreator> | null>(null);
+
+watch(childRef, (newchildRef) => {
+  console.log(`ComponentLayout | watcher
+    - childRef is ${newchildRef}
+  `);
+  console.log(newchildRef);
+})
+
 onMounted(async () => {
   //records.value = await authStore.odooUser!.searchRecords('hr.attendance');
 
-  const queryBuilder = authStore.odooUser!.modelQueryBuilder<HrAttendance>('hr.attendance');
-  model.value = (await queryBuilder.searchData())[0];
-  fields.value = await queryBuilder.searchFieldTypes();
-  records.value = await queryBuilder.searchReadRecords();
+  queryBuilder.value = authStore.odooUser!.modelQueryBuilder<HrAttendance>('hr.attendance');
+  model.value = (await queryBuilder.value.searchData())[0];
+  fields.value = await queryBuilder.value.searchFieldTypes();
+  records.value = await queryBuilder.value.searchReadRecords();
   viewedRecord.value = records.value[0];
 
   const perms = await authStore.odooUser!.searchReadRecord('ir.model.access', [['model_id.model', '==', 'hr.attendance']], [], undefined, 1);
@@ -47,7 +61,20 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div v-if="model && records" class="model-context">
+  <div v-if="model && records && queryBuilder" class="model-context">
+    <!--button @mousedown="() => { records?.push({
+      employee_id: [99, 'Prova'],
+      id: 0,
+      department_id: [99, 'Fake'],
+      check_in: '',
+      check_in_latitude: 0,
+      check_in_longitude: 0,
+      check_out: '',
+      check_out_latitude: 0,
+      check_out_longitude: 0,
+      worked_hours: 0
+    }) }">Add fake record</button-->
+    <!--button @mousedown="() => show = !show">CLICK</button-->
     <div class="header">
       <div class="left">
         <div class="logo">
@@ -73,20 +100,48 @@ onMounted(async () => {
 
     <div class="workspace">
       <div class="container">
-        <Models :records="records" @open-menu="() => { showMenuRecordsCreate = true }" @close-menu="() => { showMenuRecordsCreate = false }"/>
+        <Models
+          :records="records"
+          :is-creation-open="showMenuRecordsCreate"
+          :creating-record="childRef?.prova"
+          @open-menu="() => { showMenuRecordsCreate = true }"
+          @close-menu="() => { showMenuRecordsCreate = false }"
+          @open-menu-details="(record, index) => { viewedRecord = record, showMenuRecordInfo = true}"
+        />
       </div>
 
-      <div v-if="showMenuRecordsCreate" class="container">
-        <RecordCreator :fields="Object.entries(fields)"/>
-      </div>
+      <LayoutCollapsable v-if="showMenuRecordsCreate"  :collapsed="showMenuRecordsCreate" class="container creator">
+        <RecordCreator v-if="showMenuRecordsCreate"
+          ref="childRef"
+          :fields="Object.entries(fields)"
+          :query-builder="queryBuilder"
+          @create-record="(record) => {
+            records?.push(record);
+          }"
+          @close="() => showMenuRecordsCreate = false"
+        />
+      </LayoutCollapsable>
 
       <!--div class="container">
         <QueryBuilder/>
       </div-->
 
-      <div v-if="showMenuRecordInfo" class="container">
-        <RecordInfo v-if="viewedRecord" :record="viewedRecord"/>
-      </div>
+      <LayoutCollapsable v-if="showMenuRecordInfo" :collapsed="showMenuRecordInfo" class="container details">
+        <RecordDetails
+          v-if="showMenuRecordInfo && viewedRecord"
+          :fields="Object.entries(fields)"
+          :record="viewedRecord"
+          :admin="authStore.odooUser!.uid"
+          :query-builder="queryBuilder"
+          @modify-record="(oldRecord, newRecord) => {
+            const index = records!.findIndex(item => item.id === newRecord.id);
+            records!.splice(index, 1, newRecord);
+
+            console.log('record replaced for checkout');
+          }"
+          @close="() => showMenuRecordInfo = false"
+        />
+      </LayoutCollapsable>
     </div>
   </div>
 </template>
@@ -176,10 +231,12 @@ onMounted(async () => {
     width: 100%;
     height: 100%;
 
-    display: grid;
-    grid-template-columns: repeat(2, auto);
+    //display: grid;
+    //grid-template-columns: repeat(2, auto);
     //grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
     //grid-template-columns: repeat(auto-fill, 1fr);
+
+    display: flex;
     gap: 14px;
 
     .container {
@@ -189,11 +246,22 @@ onMounted(async () => {
       border-radius: 12px;
 
       //background-color: rgb(226, 226, 226);
-      background-color: white;
+      background: linear-gradient(to bottom, #fffef4, #ffffff);
+
+      //background-color: rgba(255, 255, 255, 0.925);
+      backdrop-filter: saturate(160%) blur(32px);
       box-shadow: rgba(0, 0, 0, 0.08) 0px 4px 12px;
 
       //background: linear-gradient(90deg, rgb(253, 255, 243), rgb(255, 252, 247));
       //backdrop-filter: blur(3px);
+
+      &.creator {
+        width: 60%;
+      }
+
+      &.details {
+        width: 60%;
+      }
     }
   }
 }

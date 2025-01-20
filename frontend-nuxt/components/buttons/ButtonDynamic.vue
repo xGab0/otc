@@ -69,6 +69,8 @@ function lightenRGBToStyle(color: { r: number, g: number, b: number }, percentag
   gap: 6px;
   //background-color: rgb(255, 240, 240);
 
+  cursor: pointer;
+
   span {
     font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
     font-size: 13px;

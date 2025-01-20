@@ -1,7 +1,7 @@
 <script setup lang="ts">
-const checkInLat = ref<number>(40.748817);
-const checkInLng = ref<number>(-73.985428);
-
+const checkInLat = ref<number>(45.42072299748633);
+const checkInLng = ref<number>(10.403388270817908);
+ 
 const checkOutLat = ref<number>(0);
 const checkOutLng = ref<number>(0);
 
@@ -15,8 +15,6 @@ const googleUrl = computed(() => {
     <iframe
       v-if="checkInLat && checkInLng"
       :src="googleUrl"
-      width="600"
-      height="450"
       frameborder="0"
       style="border:0;"
       allowfullscreen="false"

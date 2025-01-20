@@ -2,11 +2,9 @@
 import type { HrAttendance } from '~/hooks/hr';
 import IconMore from '../icons/IconMore.vue';
 import BadgeDynamic from '../badges/BadgeDynamic.vue';
-import TimeDifference from '../items/TimeDifference.vue';
+import RealtimeDate from '../items/RealtimeDate.vue';
 
 interface Props {
-  index: number,
-  selected: boolean,
   record: HrAttendance,
   show: [
     ids: boolean,
@@ -20,11 +18,7 @@ interface Props {
     workedHours: boolean
   ]
 }
-const { selected, record, show } = defineProps<Props>();
-
-const emit = defineEmits<{
-  (event: 'toggleSelected', index: number, selected: boolean): void
-}>()
+const { record, show } = defineProps<Props>();
 
 function formatTime(decimalTime: number) {
   const hours = Math.floor(decimalTime); // Prendi la parte intera (ore)
@@ -33,22 +27,29 @@ function formatTime(decimalTime: number) {
   // Aggiungi uno zero davanti ai minuti se sono inferiori a 10
   return `${hours}:${minutes < 10 ? '0' : ''}${minutes}`;
 }
+
+onMounted(() => {
+
+  console.log(`
+      CreatingRow | onMounted
+      - record: ${record}
+    `);
+})
 </script>
 
 <template>
-  <div class="row" :class="selected ? 'selected' : ''">
-    <input type="checkbox" :checked="selected" @input="$emit('toggleSelected', index, !selected)"/>
-
+  <div class="row">
     <div v-if="show[0]" class="column">
       <span>{{record.id}}</span>
     </div>
 
     <div v-if="show[1]" class="column">
-      <span class="employee">{{record.employee_id[1]}}</span>
+      <span v-if="record.employee_id" class="employee">{{record.employee_id.display_name}}</span>
+      <BadgesBadgeDynamic v-else name="select" :color="{r: 255, g: 241, b: 214}"/>
     </div>
 
     <div v-if="show[2]" class="column">
-      <span>{{ record.check_in }}</span>
+      <span><RealtimeDate/></span>
     </div>
 
     <div v-if="show[3]" class="column">
@@ -60,21 +61,19 @@ function formatTime(decimalTime: number) {
     </div>
 
     <div v-if="show[5]" class="column">
-      <span v-if="record.check_out">{{record.check_out}}</span>
-      <BadgeDynamic v-if="!record.check_out" name="still going" :color="{r: 243, g: 239, b: 251}"/>
+      <BadgeDynamic name="not compilable" :color="{r: 243, g: 239, b: 251}"/>
     </div>
 
     <div v-if="show[6]" class="column">
-      <span>{{record.check_out_latitude}}</span>
+      <BadgeDynamic name="not compilable" :color="{r: 243, g: 239, b: 251}"/>
     </div>
 
     <div v-if="show[7]" class="column">
-      <span>{{record.check_out_longitude}}</span>
+      <BadgeDynamic name="not compilable" :color="{r: 243, g: 239, b: 251}"/>
     </div>
 
     <div v-if="show[8]" class="column">
-      <span v-if="record.check_out">{{formatTime(record.worked_hours)}}</span>
-      <TimeDifference v-else :start-date="new Date(record.check_in)" :show-seconds="true"/>
+      <BadgeDynamic name="not compilable" :color="{r: 243, g: 239, b: 251}"/>
     </div>
 
     <!--div class="more">
@@ -89,16 +88,14 @@ function formatTime(decimalTime: number) {
   display: flex;
   align-items: center;
 
-  padding-top: 0.375rem;
-  padding-left: .35rem;
-  padding-right: .35rem;
-  padding-bottom: 0.375rem;
+  padding-top: 6px;
+  padding-left: 30px;
+  //padding-right: 12px;
+  padding-bottom: 6px;
 
   border-radius: 8px;
 
-  input {
-    margin-right: 16px;
-  }
+  background-color: rgb(220, 233, 255);
 
   .column {
     width: 100%;
@@ -121,19 +118,9 @@ function formatTime(decimalTime: number) {
     align-items: center;
   }
 
-  // Quando è selected
-  &.selected {
-    background-color: rgba(240, 240, 250, 1);
-
-    // Quando è hover e selected
-    &:hover {
-      background-color: rgb(226, 236, 255);
-    }
-  }
-
   // Quando è solo hover, ma non selected
   &:hover {
-    background-color: rgba(0, 0, 0, 0.025);
+    background-color: rgb(201, 221, 255);
   }
 }
 </style>

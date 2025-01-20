@@ -5,7 +5,11 @@ import DropdownRadio from './DropdownRadio.vue';
 //const elements = defineProps<{elements: any[]}>();
 const authStore = useAuthStore();
 
-const users = ref<OdooUserData[]>();
+const users = ref<OdooUserData[]>([]);
+
+const emit = defineEmits<{
+  userSelected: [user: OdooUserData, index: number]
+}>()
 
 const onOpenDropdown = () => {
   console.log('dropdown opened');
@@ -16,7 +20,8 @@ const onCloseDropdown = (reason: string) => {
 }
 
 const onElementSelected = (element: any, index: number) => {
-  console.log('selected element: ' + element.display_name);
+  emit('userSelected', element, index);
+  console.log('UsersDropdown | selected element: ' + element.display_name);
 }
 
 onMounted(async () => {

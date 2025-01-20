@@ -1,22 +1,54 @@
 <script setup lang="ts">
 import type { OdooField } from '~/hooks/odoo/fields';
-import RecordSelector from './selectors/RecordSelector.vue';
 import UsersDropdown from './dropdowns/UsersDropdown.vue';
 import ButtonDynamic from './buttons/ButtonDynamic.vue';
+import { type ModelQueryBuilder, type OdooRecord, type OdooRecordSyntax } from '~/hooks/odoo/wrapper';
+import type { OdooUserData } from '~/hooks/odoo/data';
 
-const { fields } = defineProps<{ fields: OdooField[] }>();
+interface Props {
+  fields: OdooField[],
+  queryBuilder: ModelQueryBuilder<OdooRecord>
+}
 
-const authStore = useAuthStore();
+const { fields, queryBuilder } = defineProps<Props>();
 
-const employee = ref<string>();
+const emit = defineEmits<{
+  createRecord: [record: any]
+  close: []
+}>()
+
 const checkin = ref<string>();
-const users = ref();
-const dropdown = ref<boolean>(false);
-
+const selectedUser = ref<OdooUserData>();
 const formattedDate = ref<string>('');
 const latitude = ref<number>(0);
 const longitude = ref<number>(0);
 const errorMessage = ref<string>('');
+
+
+const prova = computed<OdooRecordSyntax>(() => ({
+  employee_id: selectedUser.value,
+  check_in: checkin.value,
+  check_in_latitude: latitude.value,
+  check_in_longitude: longitude.value
+}));
+
+/*
+const prova = ref<OdooRecordSyntax>({
+  employee_id: selectedUser.value?.id,
+  check_in: checkin.value,
+  check_in_latitude: latitude.value,
+  check_in_longitude: longitude.value
+});
+*/
+
+const increment = () => {
+  //prova.value = 'addioooo';
+};
+
+defineExpose({
+  prova,
+  increment
+});
 
 const getTodayDate = () => {
   const date = new Date();
@@ -71,14 +103,49 @@ const handleError = (error: GeolocationPositionError) => {
   }
 };
 
+const onUserSelected = (user: OdooUserData, index: number) => {
+  selectedUser.value = user;
+}
+
+const createRecord = async () => {
+  const record = await queryBuilder.createRecord({
+    employee_id: selectedUser.value!.id,
+    check_in: checkin,
+    check_in_latitude: latitude,
+    check_in_longitude: longitude
+  });
+
+  console.log(record);
+
+  emit('createRecord', record);
+  emit('close');
+}
+
+/*
+watch(newRecord, () => {
+  console.log('updated new record');
+})
+*/
+
+/*
+watch(latitude, (newLatitude, oldLatitude) => {
+  newRecord.value.check_in_latitude = newLatitude;
+});
+
+watch(longitude, (newLongitude, oldLongitude) => {
+  newRecord.value.check_in_longitude = newLongitude;
+});
+*/
+
+
 onMounted(async () => {
-  users.value = await authStore.odooUser!.searchReadRecord('res.users');
+  //users.value = await authStore.odooUser!.searchReadRecord('res.users');
 
   console.log('RecordCreator | prop:fields');
   console.log(fields);
 
-  console.log('RecordCreator | users');
-  console.log(users.value);
+  //console.log('RecordCreator | users');
+  //console.log(users.value);
 
   getTodayDate();
   getUserLocation();
@@ -86,16 +153,18 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div v-if="users" class="record creator">
+  <div class="record creator">
     <div class="flex flex-col">
       <span class="text-2xl font-bold">New Record</span>
       <span class="text-normal text-gray-600 font-normal">Compile the form to create a new record for the current model</span>
     </div>
 
     <form>
+      <GoogleMapsAttendance />
+
       <div>
         <span>Users Dropdown</span>
-        <UsersDropdown/>
+        <UsersDropdown @user-selected="onUserSelected"/>
       </div>
 
       <!--div>
@@ -105,7 +174,7 @@ onMounted(async () => {
 
       <div>
         <span>Checkin Latitude</span>
-        <input v-model="latitude" type="text" placeholder="checkin latitude" readonly/>
+        <input v-model=latitude type="text" placeholder="checkin latitude" readonly/>
       </div>
 
       <div>
@@ -114,7 +183,23 @@ onMounted(async () => {
       </div>
     </form>
 
-    <ButtonDynamic name="Crea record" :color="{r: 225, g: 255, b: 231}"/>
+    <div class="flex justify-between">
+      <ButtonDynamic name="Annulla" :color="{r: 239, g: 200, b: 200}" @mousedown="() => emit('close')"/>
+
+      <ButtonDynamic v-if="selectedUser && latitude && longitude" name="Crea record" :color="{r: 225, g: 255, b: 231}" @mousedown="async () => {
+        const record = await queryBuilder.createRecord({
+          employee_id: selectedUser?.id,
+          check_in: checkin,
+          check_in_latitude: latitude,
+          check_in_longitude: longitude
+        });
+
+        console.log(record);
+
+        emit('createRecord', record);
+        emit('close');
+      }"/>
+    </div>
   </div>
 </template>
 

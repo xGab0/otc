@@ -21,11 +21,11 @@ import { OdooModule } from './module';
 import type { OdooField } from "./fields";
 import type { OdooModelData } from "./data";
 
-const DEBUG: boolean = false;
+const DEBUG: boolean = true;
 
 export type ServerVersionInfo = [number, number, number, string, number, string];
 export type OdooRecordSyntax = { [key: string]: any };
-export type LogicType = '>=' | '<=' | '==' | '!=' | 'ilike';
+export type LogicType = '>=' | '<=' | '=' | '!=' | 'ilike';
 export type LogicFilter = [string, LogicType, any];
 export type FieldsFilter = string[] | ['*'];
 export type OdooUid = {
@@ -143,7 +143,7 @@ export class OdooConnection {
 }
 
 export interface OdooRecord {
-
+  id: number
 }
 
 export class OdooUser {
@@ -739,6 +739,8 @@ export class ModelQueryBuilder<T> {
       ModelQueryBuilder | writeRecord
       - user_uid: ${this.user.uid}
       - password: ${this.user.password}
+      - id: ${recordId}
+      - body: ${JSON.stringify(body)}
       - record_updated: ${response.data.result}
     `);
 
@@ -899,7 +901,14 @@ export class ModelQueryBuilder<T> {
       'id': 1
     }
 
-    const response = await this.user.connection.client.post('', payload)
+    const response = await this.user.connection.client.post('', payload);
+
+    console.log(`
+      ModelQueryBuilder | searchReadRecords
+      - user: ${this.user.uid}
+      - password: ${this.user.password}
+      - response: ${JSON.stringify(response.data.result)}
+    `);
 
     return response.data.result;
   }

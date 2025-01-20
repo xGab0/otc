@@ -1,4 +1,8 @@
-export interface HrAttendance {
+import type { OdooModelData } from "./odoo/data"
+import { OdooModule } from "./odoo/module"
+import type { OdooRecord } from "./odoo/wrapper"
+
+export interface HrAttendance extends OdooRecord {
   id: number,
   employee_id: [number, string],
   department_id: [number, string],

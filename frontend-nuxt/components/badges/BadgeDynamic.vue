@@ -48,15 +48,16 @@ function lightenRGBToStyle(color: { r: number, g: number, b: number }, percentag
 </script>
 
 <template>
-  <div class="badge" :style="{ 'background-color': darkenRGBToStyle(color, 0) }">
-    <span :style="{ 'color': darkenRGBToStyle(color, 60) }">{{name}}</span>
-  </div>
+  <span :style="{
+    'background-color': darkenRGBToStyle(color, 0),
+    'color': darkenRGBToStyle(color, 60)
+  }">
+    {{name}}
+  </span>
 </template>
 
 <style lang="scss" scoped>
-.badge {
-  width: fit-content;
-
+span {
   padding-top: 4px;
   padding-left: 8px;
   padding-right: 8px;
@@ -64,16 +65,9 @@ function lightenRGBToStyle(color: { r: number, g: number, b: number }, percentag
 
   border-radius: 12px;
 
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  //background-color: rgb(255, 240, 240);
-
-  span {
-    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-    font-size: 13px;
-    font-weight: 500;
-    color: darkred
-  }
+  //font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  color: darkred
 }
 </style>
