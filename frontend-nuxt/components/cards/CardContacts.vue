@@ -2,29 +2,67 @@
 import IconMail from '~/components/icons/IconMail.vue';
 import IconPhone from '~/components/icons/IconPhone.vue';
 import IconWork from '~/components/icons/IconWork.vue';
+import LayoutCollapsable from '~/layouts/LayoutCollapsable.vue';
+import GradientBorderButton from '../test/GradientBorderButton.vue';
+
+const authStore = useAuthStore();
+const userData = ref<any>();
+const companies = ref<any>();
+
+onMounted(async () => {
+  userData.value = (await authStore.odooUser!.searchReadRecord('res.users', [['id', '=', authStore.odooUser?.uid]], [], undefined, 1))[0];
+
+  console.log('CardContacts | users');
+  console.log(userData.value);
+
+  companies.value = await authStore.odooUser!.searchReadRecord('res.company');
+
+  console.log('CardContacts | companies');
+  console.log(companies.value);
+
+})
 </script>
 
 <template>
-  <div class="card">
-    <span class="title">Contact</span>
+  <div class="card" v-if="userData">
+    <span class="title">Contacts</span>
+
+    <!--GradientBorderButton /-->
 
     <div class="content">
       <div class="element">
         <span class="key">First Name</span>
-        <span class="value">Mitchell</span>
+        <input>
+        <span class="value">{{ userData.employee_id[1].split(' ')[0] }}</span>
         <div class="separator"/>
       </div>
 
       <div class="element">
         <span class="key">Last Name</span>
-        <span class="value">Admin</span>
+        <span class="value">{{ userData.employee_id[1].split(' ')[1] }}</span>
+        <div class="separator"/>
+      </div>
+
+      <div class="element">
+        <span class="key">Company</span>
+        <div class="value">
+          <span class="value">{{ userData.company_id[1] }}</span>
+          <IconWork/>
+        </div>
+
+        <!--LayoutCollapsable :collapsed="true">
+          <div class="flex flex-col gap-1">
+            <span v-for="company in companies">{{ company.display_name }}</span>
+          </div>
+        </LayoutCollapsable-->
+
         <div class="separator"/>
       </div>
 
       <div class="element">
         <span class="key">Job Title</span>
         <div class="value">
-          <span class="value">Developer</span>
+          <span class="value">{{ userData.job_title }}</span>
           <IconWork/>
         </div>
         <div class="separator"/>
@@ -33,7 +71,7 @@ import IconWork from '~/components/icons/IconWork.vue';
       <div class="element">
         <span class="key">Business Phone</span>
         <div class="value">
-          <span class="value">+39 393 939 3939</span>
+          <span class="value">{{ userData.work_phone}}</span>
           <IconPhone/>
         </div>
         <div class="separator"/>
@@ -42,7 +80,7 @@ import IconWork from '~/components/icons/IconWork.vue';
       <div class="element">
         <span class="key">Business Email</span>
         <div class="value">
-          <span>business@mail.com</span>
+          <span>{{ userData.work_email }}</span>
           <IconMail/>
         </div>
         <div class="separator"/>
@@ -51,7 +89,7 @@ import IconWork from '~/components/icons/IconWork.vue';
       <div class="element">
         <span class="key">Personal Phone</span>
         <div class="value">
-          <span class="value">+39 393 939 3939</span>
+          <span class="value">{{ userData.phone }}</span>
           <IconPhone/>
         </div>
         <div class="separator"/>
@@ -60,7 +98,7 @@ import IconWork from '~/components/icons/IconWork.vue';
       <div class="element">
         <span class="key">Personal Email</span>
         <div class="value">
-          <span>personal@mail.com</span>
+          <span>{{ userData.private_email }}</span>
           <IconMail/>
         </div>
       </div>
@@ -70,13 +108,13 @@ import IconWork from '~/components/icons/IconWork.vue';
 
 <style lang="scss" scoped>
 .card {
-  padding: 24px;
+  padding: 12px 24px 16px 24px;
 
   display: flex;
   flex-direction: column;
-  gap: 34px;
+  gap: 12px;
 
-  border-radius: 32px;
+  border-radius: 24px;
   background-color: white;
 
   .title {

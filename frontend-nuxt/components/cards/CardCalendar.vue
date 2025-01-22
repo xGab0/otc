@@ -1,15 +1,57 @@
 <script setup lang="ts">
+import type { HrAttendance } from '~/hooks/hr';
 import IconChevronLeft from '../icons/chevron/IconChevronLeft.vue';
 import IconChevronRight from '../icons/chevron/IconChevronRight.vue';
 import IconChevron from '../icons/IconChevron.vue';
 import CardCalendarDay from './CardCalendarDay.vue';
+import CardGeneric from './CardGeneric.vue';
 import CardShift from './CardShift.vue';
+import type { LogicFilter } from '~/hooks/odoo/wrapper';
+
+export type Locale = `${string}-${string}`; 
 
 // Definisci il tipo per la prop di tipo stringa (data in formato YYYY-MM-DD)
-const { startDate } = defineProps<{ startDate: Date }>();
+const { attendances, lang, monthDate } = defineProps<{ attendances: HrAttendance[], lang: Locale, monthDate: Date }>();
 
 // Crea una variabile reattiva per i giorni del mese
 const daysOfMonth = ref<Date[]>([]);
+const selectedDayIndex = ref<number>(0);
+//const daySelected = ref<Date>(new Date());
+
+const selectedDay = computed(() => {
+  console.log('selectedDay');
+  return daysOfMonth.value[selectedDayIndex.value];
+})
+
+const currentDayAttendances = computed(() => {
+  return attendances.filter(attendance => {
+    const foundAttendance = attendances[selectedDayIndex.value];
+
+    if (foundAttendance === undefined) return false;
+
+    const daySelected = new Date(foundAttendance.check_in);
+    const checkInDate = new Date(attendance.check_in);
+
+    console.log('currentDayAttendances');
+
+    selectedDay.value.getDay();
+
+    console.log(
+      `
+        ${daySelected.getFullYear()} === ${checkInDate.getFullYear()} &&
+        ${daySelected.getMonth()} === ${checkInDate.getMonth()} &&
+        ${daySelected.getDay()} === ${checkInDate.getDay()}
+      `
+    )
+
+    return daySelected.getFullYear() === checkInDate.getFullYear() &&
+            daySelected.getMonth() === checkInDate.getMonth() &&
+            daySelected.getDay() === checkInDate.getDay();
+    }
+  )
+})
+
+const monthName = computed(() => monthDate.toLocaleDateString(lang, { month: 'short' }))
 
 // Funzione che genera tutti i giorni del mese dato un "startDate"
 const generateDaysOfMonth = (date: Date) => {
@@ -37,40 +79,81 @@ function isSameDay(date1: Date, date2: Date): boolean {
          date1.getDate() === date2.getDate();
 }
 
-// Guarda la prop "startDate" e rigenera i giorni se cambia
-watch(() => startDate, (newDate) => {
+function isSelected(index: number): boolean {
+  return index == selectedDayIndex.value;
+}
+
+function formatTime(decimalTime: number) {
+  const hours = Math.floor(decimalTime); // Prendi la parte intera (ore)
+  const minutes = Math.round((decimalTime - hours) * 60); // Moltiplica la parte decimale per 60 per ottenere i minuti
+
+  // Aggiungi uno zero davanti ai minuti se sono inferiori a 10
+  return `${hours}:${minutes < 10 ? '0' : ''}${minutes}`;
+}
+
+function getAttendancesTotalTime(attendances: HrAttendance[]): string {
+  const totalWorkedHours = attendances.reduce((total, attendance) => total + attendance.worked_hours, 0);
+  return formatTime(totalWorkedHours); // Restituisci il tempo totale formattato
+}
+
+const handleDaySelected = (date: Date, index: number) => {
+  selectedDayIndex.value = index;
+}
+
+watch(selectedDayIndex, (newDaySelectedIndex) => {
+  //daySelected.value = new Date(attendances[newDaySelectedIndex].check_in);
+});
+
+// Guarda la prop "monthDate" e rigenera i giorni se cambia
+watch(() => monthDate, (newDate) => {
   generateDaysOfMonth(newDate);
 });
 
 // Chiamato quando il componente è montato
-onMounted(() => {
-  generateDaysOfMonth(startDate);
+onMounted(async () => {
+  generateDaysOfMonth(monthDate);
 });
+
+// :selected="isSameDay(monthDate, day)"
 </script>
 
 <template>
   <div class="card-calendar">
     <div class="header">
-      <span>Jenuary 2025</span>
-      <div class="flex">
-        <IconChevronLeft :width="18" :height="18"/>
-        <IconChevronRight :width="18" :height="18"/>
+      <div class="carousel-months">
+        <span>{{ monthName }} 2025</span>
+        <div class="flex">
+          <IconChevronLeft :width="18" :height="18"/>
+          <IconChevronRight :width="18" :height="18"/>
+        </div>
+      </div>
+
+      <div class="carousel-days">
+        <CardCalendarDay
+          v-for="(day, index) in daysOfMonth"
+            :key="day.toISOString()"
+            :index
+            :lang
+            :date="day"
+            :selected="isSelected(index)"
+            @mousedown="() => { selectedDayIndex = index; console.log('day changed to ' + index)}"
+            @day-selected="handleDaySelected"
+        />
       </div>
     </div>
 
-    <div class="carousel">
-      <CardCalendarDay
-        v-for="day in daysOfMonth"
-          :key="day.toISOString()"
-          :date="day"
-          :selected="isSameDay(startDate, day)"
-      />
+    <div class="stats">
+      <span>stats</span>
+      <div class="flex justify-left gap-2">
+        <CardGeneric message="Ore totali" :value="getAttendancesTotalTime(currentDayAttendances)"/>
+        <CardGeneric message="Turni" :value="currentDayAttendances.length"/>
+      </div>
     </div>
 
     <div class="shifts">
       <span>shifts</span>
       <div class="list">
-        <CardShift v-for=" in 10"/>
+        <CardShift v-for="attendance in currentDayAttendances" :attendance/>
       </div>
     </div>
   </div>
@@ -80,33 +163,46 @@ onMounted(() => {
 .card-calendar {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 16px;
 
   .header {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
+    flex-direction: column;
+    gap: 4px;
+    
+    .carousel-months {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
 
-    span {
-      font-size: 18px;
-      font-weight: 400;
+      span {
+        font-size: 18px;
+        font-weight: 400;
+      }
+    }
+
+    .carousel-days {
+      width: 300px;
+
+      overflow-x: scroll;
+      padding-bottom: 6px;
+
+      display: flex;
+      gap: 8px;
+
+      scrollbar-color: rgb(215, 215, 215) transparent;
+      scrollbar-width: thin;
+
+      &:hover {
+        scrollbar-color: rgb(215, 215, 215) rgba(0, 0, 0, 0.01);
+      }
     }
   }
 
-  .carousel {
-    width: 300px;
-    overflow-x: scroll;
-    padding-bottom: 6px;
-
+  .stats {
     display: flex;
-    gap: 8px;
-
-    scrollbar-color: rgb(215, 215, 215) transparent;
-    scrollbar-width: thin;
-
-    &:hover {
-      scrollbar-color: rgb(215, 215, 215) rgba(0, 0, 0, 0.01);
-    }
+    flex-direction: column;
+    gap: 6px;
   }
 
   .shifts {

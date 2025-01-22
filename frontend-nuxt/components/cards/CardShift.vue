@@ -1,18 +1,32 @@
+<script setup lang="ts">
+import type { HrAttendance } from '~/hooks/hr';
+
+const { attendance } = defineProps<{attendance: HrAttendance }>();
+
+function formatTime(decimalTime: number) {
+  const hours = Math.floor(decimalTime); // Prendi la parte intera (ore)
+  const minutes = Math.round((decimalTime - hours) * 60); // Moltiplica la parte decimale per 60 per ottenere i minuti
+
+  // Aggiungi uno zero davanti ai minuti se sono inferiori a 10
+  return `${hours}:${minutes < 10 ? '0' : ''}${minutes}`;
+}
+</script>
+
 <template>
   <div class="card-shift">
     <div class="element">
-      <span class="key">Checkin</span>
-      <span class="value">10:47:32</span>
+      <span class="key">Check In</span>
+      <span class="value">{{ attendance.check_in.split(' ')[1] }}</span>
     </div>
 
     <div class="element">
-      <span class="key">Checkin</span>
-      <span class="value">10:47:32</span>
+      <span class="key">Check Out</span>
+      <span class="value">{{ attendance.check_out.split(' ')[1] }}</span>
     </div>
 
     <div class="element">
       <span class="key">Hours</span>
-      <span class="value">1:32</span>
+      <span class="value">{{ formatTime(attendance.worked_hours )}}</span>
     </div>
   </div>
 </template>

@@ -10,21 +10,20 @@ import CardTask from './CardTask.vue';
     <span class="title">Tasks</span>
 
     <div class="content">
-      <CardTask v-for=" in 4" />
+      <CardTask v-for=" in 2" />
     </div>
   </div>
 </template>
 
 <style lang="scss" scoped>
 .card {
-  width: 300px;
-  padding: 24px;
+  padding: 12px 24px 0 24px;
 
   display: flex;
   flex-direction: column;
   gap: 12px;
 
-  border-radius: 32px;
+  border-radius: 24px;
   background-color: white;
 
   .title {

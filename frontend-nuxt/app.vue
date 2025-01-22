@@ -11,7 +11,9 @@ useHead({
 </script>
 
 <template>
-  <NuxtPage/>
+  <NuxtLayout>
+    <NuxtPage/>
+  </NuxtLayout>
 </template>
 
 <style lang="scss">
@@ -33,13 +35,15 @@ useHead({
 }
 
 .main-body {
+  min-height: 100vh;
+
   margin: 0;
-  padding: 0;
+  padding: 1rem;
 
   font-synthesis-weight: none;
   text-rendering: optimizeLegibility;
 
-  background-color: rgb(246, 246, 246);
+  background-color: rgb(227, 227, 227);
 
   /*
   span {
@@ -129,4 +133,14 @@ span {
   }
 }
 */
+
+.rotate-enter-active,
+.rotate-leave-active {
+  transition: all 0.4s;
+}
+.rotate-enter-from,
+.rotate-leave-to {
+  opacity: 0;
+  transform: rotate3d(1, 1, 1, 15deg);
+}
 </style>

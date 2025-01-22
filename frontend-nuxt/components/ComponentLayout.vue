@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { HrAttendance } from '~/hooks/hr';
 import IconHexagon from './icons/shapes/IconHexagon.vue';
-import Models from '~/pages/models.vue';
+import Models from '~/pages/models-old.vue';
 import type { OdooModelData } from '~/hooks/odoo/data';
 import IconGrid from './icons/IconGrid.vue';
 import RecordCreator from './RecordCreator.vue';

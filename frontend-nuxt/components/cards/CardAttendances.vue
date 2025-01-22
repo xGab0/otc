@@ -1,9 +1,26 @@
 <script setup lang="ts">
-import IconMail from '~/components/icons/IconMail.vue';
-import IconPhone from '~/components/icons/IconPhone.vue';
-import IconWork from '~/components/icons/IconWork.vue';
 import CardAttendance from './CardAttendance.vue';
 import CardCalendar from './CardCalendar.vue';
+import type { LogicFilter, ModelQueryBuilder } from '~/hooks/odoo/wrapper';
+import type { HrAttendance } from '~/hooks/hr';
+
+const authStore = useAuthStore();
+const userDataStore = useUserDataStore();
+
+const queryBuilder = ref<ModelQueryBuilder<HrAttendance>>();
+const attendances = ref<HrAttendance[]>([]);
+const currentAttendance = computed(() => attendances.value.find(attendance => attendance.check_out === undefined))
+
+onMounted(async () => {
+  const filters: LogicFilter[] = [['employee_id', '=', userDataStore.userData?.employee_id[0]]];
+
+  queryBuilder.value = authStore.odooUser!.modelQueryBuilder<HrAttendance>('hr.attendance');
+  attendances.value = await queryBuilder.value.searchReadRecords(filters);
+
+  console.log('CardCalendar | attendances');
+  console.log('employee_id = ' + userDataStore.userData?.employee_id[0]);
+  console.log(attendances.value);
+})
 </script>
 
 <template>
@@ -11,10 +28,10 @@ import CardCalendar from './CardCalendar.vue';
     <span class="title">Attendances</span>
 
     <div class="body">
-      <CardAttendance/>
+      <CardAttendance v-if="currentAttendance"/>
 
       <div class="content">
-        <CardCalendar :start-date="new Date()"/>
+        <CardCalendar :attendances lang="it-IT" :month-date="new Date()"/>
       </div>
     </div>
   </div>
@@ -22,13 +39,13 @@ import CardCalendar from './CardCalendar.vue';
 
 <style lang="scss" scoped>
 .card {
-  padding: 24px;
+  padding: 12px 24px 0 24px;
 
   display: flex;
   flex-direction: column;
   gap: 12px;
 
-  border-radius: 32px;
+  border-radius: 24px;
   background-color: white;
 
   .title {

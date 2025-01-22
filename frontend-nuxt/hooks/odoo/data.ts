@@ -12,6 +12,17 @@ export interface OdooUserData extends OdooRecordSyntax, OdooRecord {
   avatar_512: string,
   avatar_1024: string,
   avatar_1920: string,
+
+  company_id: [number, string],
+  company_ids: number[],
+  company_name: string,
+  company_address: string,
+  company_code: string,
+
+  employee_id: [number, string],
+  employee_ids: number[],
+  employee_type: string,
+  employee_phone: string,
 }
 
 export interface OdooModelData extends OdooRecordSyntax {

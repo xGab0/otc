@@ -2,6 +2,7 @@
 import type { OdooUserData } from '~/hooks/odoo/data';
 import LogoPrometika from './logos/LogoPrometika.vue';
 import LogoPrometikaSlogan from './logos/LogoPrometikaSlogan.vue';
+import IconGrid from './icons/IconGrid.vue';
 
 const { userData } = defineProps<{userData: OdooUserData | undefined}>();
 
@@ -16,9 +17,12 @@ onMounted(() => {
 
 <template>
   <div class="header">
-    <div class="logo">
-      <LogoPrometika/>
-      <LogoPrometikaSlogan/>
+    <div class="brand">
+      <IconGrid :width="26" :height="26"/>
+      <div class="logo">
+        <LogoPrometika style="height: 18px"/>
+        <!--LogoPrometikaSlogan style="height: 6px"/-->
+      </div>
     </div>
 
     <div class="profile">
@@ -31,20 +35,27 @@ onMounted(() => {
 
 <style lang="scss" scoped>
 .header {
-  padding: 12px;
+  //padding: 12px;
 
   display: flex;
   justify-content: space-between;
 
   border-radius: 16px;
-  background-color: white;
+  //background-color: white;
 
-  .logo {
-    height: 50px;
+  .brand {
     display: flex;
-    flex-direction: column;
-    gap: 10px;
+    align-items: center;
+    gap: 6px;
+
+    .logo {
+      //height: 30px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
   }
+
   .profile {
     display: flex;
     align-items: center;

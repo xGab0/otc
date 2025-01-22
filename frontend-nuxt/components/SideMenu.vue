@@ -31,6 +31,7 @@ onMounted(async () => {
 
 <template>
   <div class="sidebar">
+    <span class="title">Menu</span>
     <!--div class="logo">
       <LogoPrometika/>
       <LogoPrometikaSlogan/>
@@ -44,25 +45,25 @@ onMounted(async () => {
       </div>
 
       <div class="body">
-        <div class="element" :class="{ 'selected': router.currentRoute.value.path === '/home'}">
+        <div class="element" :class="{ 'selected': router.currentRoute.value.path === '/home'}" @mousedown="() => router.push('/home')">
           <IconUser/>
           <span>home</span>
           <!--span v-for="user in users">{{ user.display_name }}</span-->
         </div>
 
 
-        <div class="element" :class="{ 'selected': router.currentRoute.value.path === '/users'}">
+        <div class="element" :class="{ 'selected': router.currentRoute.value.path === '/users'}" @mousedown="() => router.push('/users')">
           <IconUser/>
           <span>utenti</span>
           <!--span v-for="user in users">{{ user.display_name }}</span-->
         </div>
 
-        <div class="element" :class="{ 'selected': router.currentRoute.value.path === '/models'}">
+        <div class="element" :class="{ 'selected': router.currentRoute.value.path === '/models'}" @mousedown="() => router.push('/models')">
           <IconUser/>
           <span>modelli</span>
         </div>
 
-        <div class="element" :class="{ 'selected': router.currentRoute.value.path === '/models'}">
+        <div class="element" :class="{ 'selected': router.currentRoute.value.path === '/presences'}">
           <IconUser/>
           <span>presenze</span>
         </div>
@@ -75,7 +76,7 @@ onMounted(async () => {
       </div>
 
       <div class="body">
-        <div class="element">
+        <div class="element" :class="{ 'selected': router.currentRoute.value.path === '/contacts'}" @mousedown="() => router.push('/contacts')">
           <IconRhombus/>
           <span>contatti</span>
         </div>
@@ -113,7 +114,12 @@ onMounted(async () => {
 
   display: flex;
   flex-direction: column;
-  gap: 100px;
+  gap: 20px;
+
+  .title {
+    font-size: 26px;
+    font-weight: 400;
+  }
 
   .logo {
     height: 50px;
@@ -152,7 +158,8 @@ onMounted(async () => {
         gap: 6px;
 
         &.selected {
-          background-color: aqua;
+          background-color: white;
+          box-shadow: 0px 2px 3px 0px rgb(229, 229, 229);
         }
 
         svg {
