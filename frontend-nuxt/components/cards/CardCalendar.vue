@@ -2,20 +2,18 @@
 import type { HrAttendance } from '~/hooks/hr';
 import IconChevronLeft from '../icons/chevron/IconChevronLeft.vue';
 import IconChevronRight from '../icons/chevron/IconChevronRight.vue';
-import IconChevron from '../icons/IconChevron.vue';
 import CardCalendarDay from './CardCalendarDay.vue';
 import CardGeneric from './CardGeneric.vue';
 import CardShift from './CardShift.vue';
-import type { LogicFilter } from '~/hooks/odoo/wrapper';
 
-export type Locale = `${string}-${string}`; 
+export type Locale = `${string}-${string}`;
 
 // Definisci il tipo per la prop di tipo stringa (data in formato YYYY-MM-DD)
 const { attendances, lang, monthDate } = defineProps<{ attendances: HrAttendance[], lang: Locale, monthDate: Date }>();
 
 // Crea una variabile reattiva per i giorni del mese
 const daysOfMonth = ref<Date[]>([]);
-const selectedDayIndex = ref<number>(0);
+const selectedDayIndex = ref<number>(new Date().getDate() - 1);
 //const daySelected = ref<Date>(new Date());
 
 const selectedDay = computed(() => {
@@ -23,33 +21,42 @@ const selectedDay = computed(() => {
   return daysOfMonth.value[selectedDayIndex.value];
 })
 
-const currentDayAttendances = computed(() => {
+const filteredAttendancesForDayIndex = (dayIndex: number): HrAttendance[] => {
   return attendances.filter(attendance => {
-    const foundAttendance = attendances[selectedDayIndex.value];
+    console.log('Selected Day Index changed:', dayIndex);
 
-    if (foundAttendance === undefined) return false;
+    // odoo put false in not initialized fields
+    if (attendance.check_out === false) return false;
 
-    const daySelected = new Date(foundAttendance.check_in);
     const checkInDate = new Date(attendance.check_in);
 
-    console.log('currentDayAttendances');
-
-    selectedDay.value.getDay();
+    console.log('NEW currentDayAttendances');
 
     console.log(
       `
-        ${daySelected.getFullYear()} === ${checkInDate.getFullYear()} &&
-        ${daySelected.getMonth()} === ${checkInDate.getMonth()} &&
-        ${daySelected.getDay()} === ${checkInDate.getDay()}
+        ${selectedDay.value.getFullYear()} === ${checkInDate.getFullYear()} &&
+        ${selectedDay.value.getMonth()} === ${checkInDate.getMonth()} &&
+        ${selectedDay.value.getDay()} === ${checkInDate.getDay()}
       `
     )
 
-    return daySelected.getFullYear() === checkInDate.getFullYear() &&
-            daySelected.getMonth() === checkInDate.getMonth() &&
-            daySelected.getDay() === checkInDate.getDay();
-    }
-  )
+    return  selectedDay.value.getFullYear() === checkInDate.getFullYear() &&
+            selectedDay.value.getMonth() === checkInDate.getMonth() &&
+            selectedDay.value.getDay() === checkInDate.getDay()
+  })
+}
+
+const filterAttendancesForDayIndex = (dayIndex: number): void => {
+  newCurrentDayAttendances.value = filteredAttendancesForDayIndex(dayIndex);
+}
+
+watch(selectedDayIndex, (newSelectedDayIndex) => {
+  filterAttendancesForDayIndex(newSelectedDayIndex);
+
+  console.log(attendances);
+  console.log(newCurrentDayAttendances.value);
 })
+
 
 const monthName = computed(() => monthDate.toLocaleDateString(lang, { month: 'short' }))
 
@@ -100,18 +107,19 @@ const handleDaySelected = (date: Date, index: number) => {
   selectedDayIndex.value = index;
 }
 
-watch(selectedDayIndex, (newDaySelectedIndex) => {
-  //daySelected.value = new Date(attendances[newDaySelectedIndex].check_in);
-});
-
 // Guarda la prop "monthDate" e rigenera i giorni se cambia
 watch(() => monthDate, (newDate) => {
   generateDaysOfMonth(newDate);
 });
 
+const newCurrentDayAttendances = ref<HrAttendance[]>(filteredAttendancesForDayIndex(selectedDayIndex.value));
+
 // Chiamato quando il componente è montato
 onMounted(async () => {
+  console.log('CardCalendar | onMounted')
+
   generateDaysOfMonth(monthDate);
+  filterAttendancesForDayIndex(selectedDayIndex.value);
 });
 
 // :selected="isSameDay(monthDate, day)"
@@ -145,15 +153,15 @@ onMounted(async () => {
     <div class="stats">
       <span>stats</span>
       <div class="flex justify-left gap-2">
-        <CardGeneric message="Ore totali" :value="getAttendancesTotalTime(currentDayAttendances)"/>
-        <CardGeneric message="Turni" :value="currentDayAttendances.length"/>
+        <CardGeneric message="Ore totali" :value="getAttendancesTotalTime(newCurrentDayAttendances)"/>
+        <CardGeneric message="Turni" :value="newCurrentDayAttendances.length"/>
       </div>
     </div>
 
     <div class="shifts">
       <span>shifts</span>
       <div class="list">
-        <CardShift v-for="attendance in currentDayAttendances" :attendance/>
+        <CardShift v-for="attendance in newCurrentDayAttendances" :attendance/>
       </div>
     </div>
   </div>
@@ -169,7 +177,7 @@ onMounted(async () => {
     display: flex;
     flex-direction: column;
     gap: 4px;
-    
+
     .carousel-months {
       display: flex;
       justify-content: space-between;

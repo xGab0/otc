@@ -7,10 +7,10 @@ export interface HrAttendance extends OdooRecord {
   employee_id: [number, string],
   department_id: [number, string],
   check_in: string,
-  check_in_latitude: number,
-  check_in_longitude: number,
-  check_out: string,
-  check_out_latitude: number,
-  check_out_longitude: number,
+  check_in_latitude: number | boolean,
+  check_in_longitude: number | boolean,
+  check_out: string | boolean,
+  check_out_latitude: number | boolean,
+  check_out_longitude: number | boolean,
   worked_hours: number
 }

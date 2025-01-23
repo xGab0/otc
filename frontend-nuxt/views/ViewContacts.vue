@@ -26,7 +26,7 @@ const personalEmail = ref<string>(userData.private_email);
 
     <div class="content">
       <div class="section">
-        <span>business data</span>
+        <span>public data</span>
 
         <div class="element-container">
           <div class="element">

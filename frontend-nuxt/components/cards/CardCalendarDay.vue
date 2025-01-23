@@ -27,7 +27,10 @@ const isWeekend = computed(() => date.getDay() === 0 || date.getDay() === 6) // 
 
 <style lang="scss" scoped>
 .card-calendar-day {
-  padding: 4px 8px 4px 8px;
+  width: 36px;
+  flex: 0 0 auto;
+
+  //padding: 4px 8px 4px 8px;
   border-radius: 12px;
 
   display: flex;
@@ -45,7 +48,7 @@ const isWeekend = computed(() => date.getDay() === 0 || date.getDay() === 6) // 
       font-size: 12px;
       font-weight: 500;
       text-align: center;
-      color: rgb(54, 88, 114); 
+      color: rgb(54, 88, 114);
     }
 
     .day-index {

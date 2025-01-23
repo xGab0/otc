@@ -9,7 +9,7 @@ const userDataStore = useUserDataStore();
 
 const queryBuilder = ref<ModelQueryBuilder<HrAttendance>>();
 const attendances = ref<HrAttendance[]>([]);
-const currentAttendance = computed(() => attendances.value.find(attendance => attendance.check_out === undefined))
+const currentAttendance = computed(() => attendances.value.find(attendance => attendance.check_out === false))
 
 onMounted(async () => {
   const filters: LogicFilter[] = [['employee_id', '=', userDataStore.userData?.employee_id[0]]];
@@ -31,7 +31,10 @@ onMounted(async () => {
       <CardAttendance v-if="currentAttendance"/>
 
       <div class="content">
-        <CardCalendar :attendances lang="it-IT" :month-date="new Date()"/>
+        <WidgetCalendar />
+
+        <!--GridCalendar :attendances lang="it-IT" :month-date="new Date()"/ -->
+        <!--CardCalendar :attendances lang="it-IT" :month-date="new Date()"/-->
       </div>
     </div>
   </div>
