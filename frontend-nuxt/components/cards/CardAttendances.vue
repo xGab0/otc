@@ -31,7 +31,7 @@ onMounted(async () => {
       <CardAttendance v-if="currentAttendance"/>
 
       <div class="content">
-        <WidgetCalendar />
+        <WidgetCalendar :attendances lang="it-IT" />
 
         <!--GridCalendar :attendances lang="it-IT" :month-date="new Date()"/ -->
         <!--CardCalendar :attendances lang="it-IT" :month-date="new Date()"/-->

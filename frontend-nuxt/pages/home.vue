@@ -1,8 +1,10 @@
 <script setup lang="ts">
+import Card from '~/components/cards/Card.vue';
 import CardAttendances from '~/components/cards/CardAttendances.vue';
 import CardContact from '~/components/cards/CardContacts.vue';
 import CardTasks from '~/components/cards/CardTasks.vue';
 import type { OdooUserData } from '~/hooks/odoo/data';
+import ViewAttendances from '~/views/ViewAttendances.vue';
 import ViewContacts from '~/views/ViewContacts.vue';
 
 definePageMeta({
@@ -33,9 +35,14 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="cards" v-if="userData">
-    <ViewContacts :userData="userData!"/>
-    <CardAttendances/>
+  <div class="cards">
+    <Card title="Contacts">
+      <ViewContacts v-if="userData" :userData="userData!"/>
+    </Card>
+
+    <Card title="Attendances">
+      <ViewAttendances />
+    </Card>
     <CardTasks/>
   </div>
 </template>
