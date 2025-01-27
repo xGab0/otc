@@ -20,7 +20,7 @@ const userData = ref<OdooUserData>();
 const partners = ref<any[]>();
 
 onMounted(async () => {
-  partners.value = await authStore.odooUser!.searchReadRecord('res.partner');
+  partners.value = await authStore.odooUser!.searchReadRecords('res.partner');
 
   console.log('Contacts | partners');
   console.log(partners.value);

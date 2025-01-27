@@ -27,7 +27,7 @@ onMounted(async () => {
   console.log('Home | userData');
   console.log(userData.value);
 
-  const tasks = await authStore.odooUser!.searchReadRecord('project.task');
+  const tasks = await authStore.odooUser!.searchReadRecords('project.task');
 
   console.log('Home | tasks');
   console.log(tasks);
@@ -37,11 +37,15 @@ onMounted(async () => {
 <template>
   <div class="cards">
     <Card title="Contacts">
-      <ViewContacts v-if="userData" :userData="userData!"/>
+      <template v-slot:body>
+        <ViewContacts v-if="userData" :userData="userData!"/>
+      </template>
     </Card>
 
     <Card title="Attendances">
-      <ViewAttendances />
+      <template v-slot:body>
+        <ViewAttendances />
+      </template>
     </Card>
     <CardTasks/>
   </div>

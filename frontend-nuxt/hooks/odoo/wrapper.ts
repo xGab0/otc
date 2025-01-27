@@ -534,7 +534,7 @@ export class OdooUser {
   * @param {number} limit - The max number of records to be retrieved
   * @returns {OdooRecord[]} List of the records
   */
-  public async searchReadRecord(
+  public async searchReadRecords(
     modelName: string,
     andFilters: LogicFilter[] = [],
     orFilters: LogicFilter[] = [],
@@ -596,6 +596,86 @@ export class OdooUser {
 
     return response.data.result;
   }
+
+  public async readRecord(
+    modelName: string,
+    recordId: number,
+    fields?: FieldsFilter,
+    limit?: number
+  ): Promise<T> {
+    const params = {
+      service: 'object',
+      method: 'execute_kw',
+      args: [
+        this.database,
+        this.uid,
+        this.password,
+        modelName,
+        'read',
+        [[recordId]],
+        {
+          fields,
+          limit,
+        }
+      ],
+    }
+
+    const payload = {
+      'jsonrpc': '2.0',
+      'method': 'call',
+      'params': params,
+      'id': 1
+    }
+
+    const response = await this.connection.client.post('', payload);
+
+    if (DEBUG) {
+      console.log(`
+        ModelQueryBuilder | readRecord
+        - user: ${this.uid}
+        - password: ${this.password}
+        - response:
+          ${JSON.stringify(response.data.result)}
+      `);
+    }
+
+    return response.data.result[0];
+  }
+
+  public async readRecords(
+    modelName: string,
+    recordsId: number[],
+    fields?: FieldsFilter,
+    limit?: number
+  ): Promise<T[]> {
+    const params = {
+      service: 'object',
+      method: 'execute_kw',
+      args: [
+        this.database,
+        this.uid,
+        this.password,
+        modelName,
+        'read',
+        [recordsId],
+        {
+          fields,
+          limit,
+        }
+      ],
+    }
+
+    const payload = {
+      'jsonrpc': '2.0',
+      'method': 'call',
+      'params': params,
+      'id': 1
+    }
+
+    const response = await this.connection.client.post('', payload)
+
+    return response.data.result;
+  }
 }
 
 export class ModelQueryBuilder<T> {
@@ -608,7 +688,7 @@ export class ModelQueryBuilder<T> {
   }
 
   public async searchData(): Promise<OdooModelData> {
-    return await this.user.searchReadRecord('ir.model', [['model', '=', this.modelName]], [], [], undefined);
+    return await this.user.searchReadRecords('ir.model', [['model', '=', this.modelName]], [], [], undefined);
   }
 
   public async searchFieldTypes(): Promise<OdooField[]> {
@@ -918,44 +998,44 @@ export class ModelQueryBuilder<T> {
     fields?: FieldsFilter,
     limit?: number
   ): Promise<T> {
-      const params = {
-        service: 'object',
-        method: 'execute_kw',
-        args: [
-          this.user.database,
-          this.user.uid,
-          this.user.password,
-          this.modelName,
-          'read',
-          [[recordId]],
-          {
-            fields,
-            limit,
-          }
-        ],
-      }
-
-      const payload = {
-        'jsonrpc': '2.0',
-        'method': 'call',
-        'params': params,
-        'id': 1
-      }
-
-      const response = await this.user.connection.client.post('', payload);
-
-      if (DEBUG) {
-        console.log(`
-          ModelQueryBuilder | readRecord
-          - user: ${this.user.uid}
-          - password: ${this.user.password}
-          - response:
-            ${JSON.stringify(response.data.result)}
-        `);
-      }
-
-      return response.data.result[0];
+    const params = {
+      service: 'object',
+      method: 'execute_kw',
+      args: [
+        this.user.database,
+        this.user.uid,
+        this.user.password,
+        this.modelName,
+        'read',
+        [[recordId]],
+        {
+          fields,
+          limit,
+        }
+      ],
     }
+
+    const payload = {
+      'jsonrpc': '2.0',
+      'method': 'call',
+      'params': params,
+      'id': 1
+    }
+
+    const response = await this.user.connection.client.post('', payload);
+
+    if (DEBUG) {
+      console.log(`
+        ModelQueryBuilder | readRecord
+        - user: ${this.user.uid}
+        - password: ${this.user.password}
+        - response:
+          ${JSON.stringify(response.data.result)}
+      `);
+    }
+
+    return response.data.result[0];
+  }
 
     public async readRecords(
       recordsId: number[],
@@ -992,8 +1072,3 @@ export class ModelQueryBuilder<T> {
     }
 
 }
-
-
-export { OdooModelData };
-//const connection = await OdooConnection.connect('http://localhost:8070/jsonrpc');
-//const user = await connection.login('odoo-rest-db', 'admin', 'admin')

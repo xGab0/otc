@@ -1,9 +1,9 @@
 <script setup lang="ts">
 interface Props {
-  fill: string
+  fill?: string
 }
 
-defineProps<Props>();
+const { fill = "black" } = defineProps<Props>();
 </script>
 
 <template>

@@ -2,7 +2,7 @@
 <script setup lang="ts">
 useHead({
   htmlAttrs: {
-    class: 'html'
+    class: 'html-main'
   },
   bodyAttrs: {
     class: 'main-body'
@@ -17,9 +17,14 @@ useHead({
 </template>
 
 <style lang="scss">
-.html {
+.html-main{
   --font-geist-mono: 'GiestMono',
-  --font-geist-sans: 'GeistSans'
+  --font-geist-sans: 'GeistSans';
+
+  overflow-y: scroll;
+
+  scrollbar-color: rgb(255, 255, 255) transparent;
+  scrollbar-width: auto;
 
   /*
   height: 100vh;
@@ -44,7 +49,6 @@ useHead({
   text-rendering: optimizeLegibility;
 
   background-color: rgb(227, 227, 227);
-
   /*
   span {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -57,6 +61,7 @@ useHead({
 }
 
 span {
+  line-height: normal;
   font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
 }
 

@@ -27,6 +27,6 @@ onMounted(async () => {
 
 <style lang="scss" scoped>
 .separation {
-  gap: 1rem
+  gap: 1rem;
 }
 </style>
