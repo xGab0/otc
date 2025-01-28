@@ -41,6 +41,26 @@ onMounted(async () => {
 
   console.log('Home | mailings');
   console.log(mailings.value);
+
+  console.log(
+    `Marketing | Dashboard
+    - campaigns:`, await authStore.odooUser!.searchReadRecords('marketing.campaign')
+  );
+
+  console.log(
+    `Marketing | Dashboard
+    - groups:`, await authStore.odooUser!.searchReadRecords('marketing.group')
+  );
+
+  console.log(
+    `Marketing | Dashboard
+    - plans:`, await authStore.odooUser!.searchReadRecords('marketing.plan')
+  );
+
+  console.log(
+    `Marketing | Dashboard
+    - sms:`, await authStore.odooUser!.searchReadRecords('marketing.sms')
+  );
 })
 </script>
 

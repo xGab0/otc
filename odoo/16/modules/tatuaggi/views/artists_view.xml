@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+  <data>
+    <record id="tatuaggi_artist_tree_view" model="ir.ui.view">
+      <field name="name">tatuaggi.artist.tree</field>
+      <field name="model">tatuaggi.artist</field>
+      <field name="arch" type="xml">
+        <tree>
+          <field name="name"/>
+          <field name="available_tattoos"/>
+        </tree>
+      </field>
+    </record>
+
+    <!-- Same id as the action id defined in other views -->
+    <record id="action_new_artist" model="ir.actions.act_window">
+      <!-- Human-readable name of the view -->
+      <field name="name">Tatuatori</field>
+
+      <!-- Model id -->
+      <field name="res_model">tatuaggi.artist</field>
+
+      <!-- Add available view layouts -->
+      <field name="view_mode">tree,form</field>
+
+      <!-- Choose a view layout -->
+      <field name="view_id" ref="tatuaggi_artist_tree_view"/>
+
+      <field name="help" type="html">
+        <p class="o_view_nocontent_smiling_face">
+          Aggiungi un artista
+        </p>
+      </field>
+    </record>
+  </data>
+</odoo>

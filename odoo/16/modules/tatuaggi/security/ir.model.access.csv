@@ -1,0 +1,8 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+tatuaggi.access_tatuaggi_appointment,access_tatuaggi_appointment,tatuaggi.model_tatuaggi_appointment,base.group_user,1,1,1,1
+tatuaggi.access_tatuaggi_tattoo,access_tatuaggi_tattoo,tatuaggi.model_tatuaggi_tattoo,base.group_user,1,1,1,1
+tatuaggi.access_tatuaggi_artist,access_tatuaggi_artist,tatuaggi.model_tatuaggi_artist,base.group_user,1,1,1,1
+access_marketing_campaign,Marketing Campaign,tatuaggi.model_marketing_campaign,base.group_user,1,1,1,1
+access_marketing_group,Marketing Group,tatuaggi.model_marketing_group,base.group_user,1,1,1,1
+access_marketing_plan,Marketing Plan,tatuaggi.model_marketing_plan,base.group_user,1,1,1,1
+access_marketing_sms,Marketing Sms,tatuaggi.model_marketing_sms,base.group_user,1,1,1,1

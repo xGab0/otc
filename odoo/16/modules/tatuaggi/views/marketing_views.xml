@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <!-- Vista per MarketingSms -->
+    <record id="view_marketing_sms_form" model="ir.ui.view">
+        <field name="name">marketing.sms.form</field>
+        <field name="model">marketing.sms</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <field name="campaign_id"/>
+                        <field name="scheduled_date"/>
+                        <field name="contacts_domain"/>
+                        <button 
+                            name="action_load_contacts" 
+                            string="Carica Contatti" 
+                            type="object"
+                            class="oe_highlight"/>
+                    </group>
+                    <group>
+                        <field name="body"/>
+                        <field name="partner_ids" widget="many2many_tags"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Vista per MarketingCampaign -->
+    <record id="view_marketing_campaign_form" model="ir.ui.view">
+        <field name="name">marketing.campaign.form</field>
+        <field name="model">marketing.campaign</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="marketing_group_id"/>
+                    </group>
+                    <field name="sms_ids">
+                        <tree>
+                            <field name="scheduled_date"/>
+                            <field name="partner_ids" widget="many2many_tags"/>
+                        </tree>
+                    </field>
+                </sheet>
+            </form>
+        </field>
+    </record>
+</odoo>

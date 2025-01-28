@@ -14,9 +14,9 @@ const views = ref();
 // router.currentRoute.value.name
 
 onMounted(async () => {
-  users.value = await authStore.odooUser!.searchReadRecord('res.users');
-  models.value = await authStore.odooUser!.searchReadRecord('ir.model');
-  views.value = await authStore.odooUser!.searchReadRecord('ir.ui.view');
+  users.value = await authStore.odooUser!.searchReadRecords('res.users');
+  models.value = await authStore.odooUser!.searchReadRecords('ir.model');
+  views.value = await authStore.odooUser!.searchReadRecords('ir.ui.view');
 
   console.log('SideMenu | users');
   console.log(users.value);
@@ -76,7 +76,7 @@ onMounted(async () => {
       </div>
 
       <div class="body">
-        <div class="element" :class="{ 'selected': router.currentRoute.value.path.startsWith('/marketing/dashboard') }" @mousedown="() => router.push('/marketing/dashboard')">
+        <div class="element" :class="{ 'selected': router.currentRoute.value.path.startsWith('/marketing') }" @mousedown="() => router.push('/marketing/dashboard')">
           <IconRhombus/>
           <span>marketing</span>
         </div>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+  <!-- Define action ids to be used in record views -->
+
+  <menuitem id="menu_root_tatuaggi_ads" name="Negozio Tatuaggi" web_icon="tatuaggi,static/description/icon.png">
+    <menuitem id="menu_tattoo" name="Tatuaggi" action="tatuaggi.action_new_tattoo">
+      <!--menuitem id="menu_tattoo_list" name="Elenco" action="tatuaggi.action_new_tattoo"/>
+      <menuitem id="menu_tattoo_new" name="Crea tatuaggio" action="tatuaggi.action_new_tattoo"/>
+      <menuitem id="menu_tattoo_del" name="Rimuovi tatuaggio" action="tatuaggi.action_new_tattoo"/-->
+    </menuitem>
+
+    <menuitem id="menu_artist" name="Tatuatori" action="tatuaggi.action_new_artist">
+      <!--menuitem id="menu_artist_list" name="Elenco" action="tatuaggi.action_new_artist"/>
+      <menuitem id="menu_artist_new" name="Aggiungi tatuatore" action="tatuaggi.action_new_artist"/>
+      <menuitem id="menu_artist_del" name="Rimuovi tatuatore" action="tatuaggi.action_new_artist"/-->
+    </menuitem>
+
+    <menuitem id="menu_appointment" name="Appuntamenti" action="tatuaggi.action_new_appointment">
+      <!--menuitem id="menu_appointment_list" name="Elenco" action="tatuaggi.action_new_appointment"/>
+      <menuitem id="menu_appointment_new" name="Nuova prenotazione" action="tatuaggi.action_new_appointment"/>
+      <menuitem id="menu_appointment_del" name="Cancella prenotazione" action="tatuaggi.action_new_appointment"/-->
+    </menuitem>
+  </menuitem>
+</odoo>

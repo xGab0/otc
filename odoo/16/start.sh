@@ -17,7 +17,7 @@ source "$activate_script"
 odoo_bin="./src/odoo-bin"
 
 # Odoo start command
-odoo_command="$odoo_bin -c odoo.conf --xmlrpc-port=8070 -u hr-attendance"
+odoo_command="$odoo_bin -c odoo.conf --xmlrpc-port=8070 -u hr-attendance -u tatuaggi"
 
 # Esegui il comando
 $odoo_command

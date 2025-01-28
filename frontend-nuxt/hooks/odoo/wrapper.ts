@@ -21,7 +21,7 @@ import { OdooModule } from './module';
 import type { OdooField } from "./fields";
 import type { OdooModelData } from "./data";
 
-const DEBUG: boolean = true;
+const DEBUG: boolean = false;
 
 export type ServerVersionInfo = [number, number, number, string, number, string];
 export type OdooRecordSyntax = { [key: string]: any };
@@ -593,6 +593,15 @@ export class OdooUser {
     }
 
     const response = await this.connection.client.post('', payload)
+
+    if (DEBUG) {
+      console.log(`
+        ModelQueryBuilder | readRecord
+        - user: ${this.uid}
+        - password: ${this.password}
+        - response:
+      `, response.data);
+    }
 
     return response.data.result;
   }

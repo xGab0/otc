@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+  <data>
+
+
+    <!--record id="tatuaggi_appointment_calendar_view" model="ir.ui.view">
+      <field name="name">tatuaggi.appointment.calendar</field>
+      <field name="model">tatuaggi.appointment</field>
+      <field name="priority" eval="2"/>
+      <field name="arch" type="xml">
+        <calendar date_start="date_start" date_end="date_end">
+          <field name="date_start"/>
+          <field name="date_end"/>
+          <field name="artist_id"/>
+          <field name="tattoo_id"/>
+        </calendar>
+      </field>
+    </record-->
+
+
+    <record id="tatuaggi_appointment_tree_view" model="ir.ui.view">
+      <field name="name">tatuaggi.appointment.tree</field>
+      <field name="model">tatuaggi.appointment</field>
+      <field name="arch" type="xml">
+        <tree>
+          <field name="date_and_time" />
+          <!--field name="date"/-->
+          <field name="artist_id"/>
+          <field name="tattoo_id"/>
+          <field name="estimated_duration"/>
+          <field name="state"/>
+
+          <!--field name="name"/>
+          <field name="date"/>
+          <field name="artist_id"/>
+          <field name="tattoo_id"/>
+          <field name="estimated_duration"/>
+          <field name="state"/-->
+        </tree>
+      </field>
+    </record>
+
+    <!-- Same id as the action id defined in other views -->
+    <record id="action_new_appointment" model="ir.actions.act_window">
+      <!-- Human-readable name of the view -->
+      <field name="name">Appuntamenti</field>
+
+      <!-- Model id -->
+      <field name="res_model">tatuaggi.appointment</field>
+
+      <!-- Add available view layouts -->
+      <field name="view_mode">tree,form,calendar</field>
+
+      <!-- Choose a view layout -->
+      <field name="view_id" ref="tatuaggi_appointment_tree_view"/>
+
+      <!--field name="type">ir.actions.act_window</field-->
+
+      <!--field name="help" type="html">
+        <p class="o_view_nocontent_smiling_face">
+          Aggiungi una prenotazione
+        </p>
+      </field-->
+    </record>
+  </data>
+</odoo>

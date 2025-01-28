@@ -82,8 +82,8 @@ const date = ref<[month: string, day: string]>(formatDateToText(new Date(mailing
 
     > .icon {
       opacity: 0;
-
       transition: opacity .2s ease-in-out;
+      cursor: pointer;
     }
   }
 

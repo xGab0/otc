@@ -159,8 +159,8 @@ const showContextMenu = ref<boolean>(false);
 
     > .icon {
       opacity: 0;
-
       transition: opacity .2s ease-in-out;
+      cursor: pointer;
     }
   }
 

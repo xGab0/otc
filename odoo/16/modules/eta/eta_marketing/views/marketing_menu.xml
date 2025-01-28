@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <menuitem
+        id="menu_marketing_root"
+        name="Marketing"
+        sequence="100"/>
+
+    <menuitem
+        id="menu_marketing_config"
+        name="Configurazione"
+        parent="menu_marketing_root"/>
+
+    <menuitem
+        id="menu_marketing_plans"
+        name="Piani"
+        parent="menu_marketing_config"
+        action="action_marketing_plan"/>
+
+    <!-- Aggiungere azioni e menu per: -->
+    <!-- Gruppi, Campagne, SMS -->
+</odoo>
