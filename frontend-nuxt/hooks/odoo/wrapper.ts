@@ -21,7 +21,7 @@ import { OdooModule } from './module';
 import type { OdooField } from "./fields";
 import type { OdooModelData } from "./data";
 
-const DEBUG: boolean = false;
+const DEBUG: boolean = true;
 
 export type ServerVersionInfo = [number, number, number, string, number, string];
 export type OdooRecordSyntax = { [key: string]: any };
@@ -170,7 +170,7 @@ export class OdooUser {
   }
 
   public async getAllModules(): Promise<any> {
-    return await this.searchReadRecord('ir.module.module', [], [], undefined, undefined);
+    return await this.searchReadRecords('ir.module.module', [], [], undefined, undefined);
   }
 
   public async getModels(
@@ -393,6 +393,16 @@ export class OdooUser {
     }
 
     const response = await this.connection.client.post('', payload);
+
+    if (DEBUG) {
+      console.log(`
+        ModelQueryBuilder | readRecord
+        - user: ${this.uid}
+        - password: ${this.password}
+        - response:`, 
+        response
+      );
+    }
 
     return response.data.result;
   }
@@ -952,7 +962,7 @@ export class ModelQueryBuilder<T> {
   * @param {number} limit - The max number of records to be retrieved
   * @returns {OdooRecord[]} List of the records
   */
-  public async searchReadRecords(
+  public async searchReadRecords<T extends OdooRecord>(
     andFilters: LogicFilter[] = [],
     orFilters: LogicFilter[] = [],
     fields?: FieldsFilter,
@@ -1046,38 +1056,73 @@ export class ModelQueryBuilder<T> {
     return response.data.result[0];
   }
 
-    public async readRecords(
-      recordsId: number[],
-      fields?: FieldsFilter,
-      limit?: number
-    ): Promise<T[]> {
-      const params = {
-        service: 'object',
-        method: 'execute_kw',
-        args: [
-          this.user.database,
-          this.user.uid,
-          this.user.password,
-          this.modelName,
-          'read',
-          [recordsId],
-          {
-            fields,
-            limit,
-          }
-        ],
-      }
-
-      const payload = {
-        'jsonrpc': '2.0',
-        'method': 'call',
-        'params': params,
-        'id': 1
-      }
-
-      const response = await this.user.connection.client.post('', payload)
-
-      return response.data.result;
+  public async readRecords(
+    recordsId: number[],
+    fields?: FieldsFilter,
+    limit?: number
+  ): Promise<T[]> {
+    const params = {
+      service: 'object',
+      method: 'execute_kw',
+      args: [
+        this.user.database,
+        this.user.uid,
+        this.user.password,
+        this.modelName,
+        'read',
+        [recordsId],
+        {
+          fields,
+          limit,
+        }
+      ],
     }
+
+    const payload = {
+      'jsonrpc': '2.0',
+      'method': 'call',
+      'params': params,
+      'id': 1
+    }
+
+    const response = await this.user.connection.client.post('', payload)
+
+    return response.data.result;
+  }
+
+  public async deleteRecord(recordId: number): Promise<any> {
+    const params = {
+      service: 'object',
+      method: 'execute_kw',
+      args: [
+        this.user.database,
+        this.user.uid,
+        this.user.password,
+        this.modelName,
+        'unlink',
+        [recordId],
+      ]
+    }
+
+    const payload = {
+      'jsonrpc': '2.0',
+      'method': 'call',
+      'params': params,
+      'id': 1
+    }
+
+    const response = await this.user.connection.client.post('', payload);
+
+    if (DEBUG) {
+      console.log(`
+        ModelQueryBuilder | deleteRecord
+        - user: ${this.user.uid}
+        - password: ${this.user.password}
+        - response:
+      `, response);
+    }
+
+    return response.data.result;
+  }
 
 }

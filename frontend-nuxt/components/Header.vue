@@ -27,7 +27,8 @@ onMounted(() => {
 
     <div class="profile">
       <span>{{ userData?.display_name }}</span>
-      <AvatarPlaceholder v-if="!avatarBase64" name="Gabriele"/>
+      <AvatarOdooUser v-if="userData" size="42px" :user-id="userData.id" />
+      <!--AvatarPlaceholder v-if="!avatarBase64" name="Gabriele"/-->
       <!--img :src="avatarBase64" alt="Avatar utente" /-->
     </div>
   </div>

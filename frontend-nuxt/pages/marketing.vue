@@ -2,6 +2,7 @@
 import IconPlus from '~/components/icons/IconPlus.vue';
 import ModularNavigation from '~/components/navigation/new/ModularNavigation.vue';
 
+const router = useRouter();
 </script>
 
 <template>
@@ -13,6 +14,8 @@ import ModularNavigation from '~/components/navigation/new/ModularNavigation.vue
 
       <div class="section navigation">
         <ModularNavigation :pages="['dashboard', 'rubrica', 'gruppi', 'sms inviati', 'campagne sms']" />
+        <span @mousedown="() => router.push('/marketing/plans')">plans</span>
+        <span @mousedown="() => router.push('/marketing/groups')">groups</span>
       </div>
 
       <div class="section controls">
