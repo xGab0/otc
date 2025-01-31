@@ -1,13 +1,12 @@
 <script setup lang="ts">
-import AvatarOdooUser from '~/components/avatar/AvatarOdooUser.vue';
 import IconMore from '~/components/icons/IconMore.vue';
 import type { Mailing } from '~/hooks/mailing';
 import type { Marketing } from '~/hooks/marketing';
 
-const { groups } = defineProps<{ groups: Marketing.Group[] }>();
+const { campaigns } = defineProps<{ campaigns: Marketing.Campaign[] }>();
 
 const emit = defineEmits<{
-  recordView: [group: Marketing.Group]
+  recordView: [plan: Marketing.Campaign]
 }>()
 
 
@@ -16,12 +15,11 @@ const userDataStore = useUserDataStore();
 
 
 onMounted(async () => {
-  console.log(groups)
 })
 </script>
 
 <template>
-  <div v-if="groups" class="table">
+  <div v-if="campaigns" class="table">
     <div class="header">
       <div class="column selection">
         <input type="checkbox" />
@@ -32,11 +30,11 @@ onMounted(async () => {
       </div>
 
       <div class="column data">
-        <span>Plan</span>
+        <span>Group</span>
       </div>
 
       <div class="column data">
-        <span>Members</span>
+        <span>SMS</span>
       </div>
 
       <div class="column actions">
@@ -44,25 +42,25 @@ onMounted(async () => {
     </div>
 
     <div class="body">
-      <div v-for="(group, index) in groups" :key="index" class="row">
+      <div v-for="(campaign, index) in campaigns" :key="index" class="row">
         <div class="column selection">
           <input type="checkbox" />
         </div>
 
         <div class="column data">
-          {{ group.name }}
+          {{ campaign.name }}
         </div>
 
         <div class="column data">
-          {{ group.marketing_plan_id[1] }}
+          {{ campaign.marketing_group_id }}
         </div>
 
-        <div class="column data members">
-          <AvatarOdooUser v-for="memberId in group.member_ids" :user-id="memberId" size="24px"/>
+        <div class="column data">
+          {{ campaign.sms_ids }}
         </div>
 
         <div class="column actions">
-          <IconMore @mousedown="() => emit('recordView', group)" />
+          <IconMore @mousedown="() => emit('recordView', campaign)" />
         </div>
       </div>
     </div>
@@ -131,11 +129,6 @@ onMounted(async () => {
         &.data {
           width: 100%;
           text-align: left;
-
-          &.members {
-            display: flex;
-            gap: 4px;
-          }
         }
         &.actions {
           width: 10%;

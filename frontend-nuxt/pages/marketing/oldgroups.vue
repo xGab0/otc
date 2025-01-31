@@ -12,13 +12,14 @@ import ViewMailingDraft from '~/views/mailing/ViewMailingDraft.vue';
 import ViewMailingInQueue from '~/views/mailing/ViewMailingInQueue.vue';
 import ViewMailingSending from '~/views/mailing/ViewMailingSending.vue';
 import ViewMailingSent from '~/views/mailing/ViewMailingSent.vue';
+import ViewMarketingGroups from '~/views/marketing/groups/ViewMarketingGroups.vue';
+import ViewMarketingGroupsTable from '~/views/marketing/groups/ViewMarketingGroupsTable.vue';
 import ViewAttendances from '~/views/ViewAttendances.vue';
 import ViewContacts from '~/views/ViewContacts.vue';
 
 definePageMeta({
   middleware: 'auth',
   layout: 'main',
-  pageTransition: { name: 'page', mode: 'out-in' }
   /*pageTransition: {
     name: 'rotate'
   }*/
@@ -67,7 +68,7 @@ onMounted(async () => {
 
 <template>
   <div class="mailings">
-    <Card title="Draft">
+    <Card title="Groups">
       <template v-slot:header>
         <div class="flex gap-2">
           <IconPlus />
@@ -76,31 +77,7 @@ onMounted(async () => {
       </template>
 
       <template v-slot:body>
-        <ViewMailingDraft :mailings="mailings.filter(mailing => mailing.state === 'draft')" />
-      </template>
-    </Card>
-
-    <Card title="InQueue">
-      <template v-slot:header>
-        <div class="operations">
-          <IconPlus />
-        </div>
-      </template>
-
-      <template v-slot:body>
-        <ViewMailingInQueue :mailings="mailings.filter(mailing => mailing.state === 'in_queue')" />
-      </template>
-    </Card>
-
-    <Card title="Sent">
-      <template v-slot:header>
-        <div class="operations">
-          <IconPlus />
-        </div>
-      </template>
-
-      <template v-slot:body>
-        <ViewMailingSent :mailings="mailings.filter(mailing => mailing.state === 'done')" />
+        <ViewMarketingGroups :mailings="mailings.filter(mailing => mailing.state === 'draft')" />
       </template>
     </Card>
   </div>

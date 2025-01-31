@@ -11,7 +11,7 @@ export namespace Marketing {
     export interface Group extends OdooRecord {
         name: string,
         marketing_plan_id: [number, string],
-        members_ids: any
+        member_ids: any
     }
 
     export interface Plan extends OdooRecord {

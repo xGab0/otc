@@ -544,13 +544,13 @@ export class OdooUser {
   * @param {number} limit - The max number of records to be retrieved
   * @returns {OdooRecord[]} List of the records
   */
-  public async searchReadRecords(
+  public async searchReadRecords<T extends OdooRecord>(
     modelName: string,
     andFilters: LogicFilter[] = [],
     orFilters: LogicFilter[] = [],
     fields?: FieldsFilter,
     limit?: number
-  ): Promise<OdooRecord[]> {
+  ): Promise<T[]> {
     // Combina i filtri AND e OR
     const filters = [
       ...andFilters, // I filtri AND
@@ -766,9 +766,10 @@ export class ModelQueryBuilder<T> {
         ModelQueryBuilder | createRecord
         - user: ${this.user.uid}
         - password: ${this.user.password}
-        - record_id: ${response.data.result}
-        - record_body: ${JSON.stringify(body)}
-      `);
+        - model_name: ${this.modelName}
+        - body: ${JSON.stringify(body)}
+        - response:
+      `, response);
     }
 
     return response.data.result;
@@ -840,8 +841,8 @@ export class ModelQueryBuilder<T> {
       - password: ${this.user.password}
       - id: ${recordId}
       - body: ${JSON.stringify(body)}
-      - record_updated: ${response.data.result}
-    `);
+      - response:
+    `, response);
 
     return response.data.result;
   }
@@ -962,7 +963,7 @@ export class ModelQueryBuilder<T> {
   * @param {number} limit - The max number of records to be retrieved
   * @returns {OdooRecord[]} List of the records
   */
-  public async searchReadRecords<T extends OdooRecord>(
+  public async searchReadRecords(
     andFilters: LogicFilter[] = [],
     orFilters: LogicFilter[] = [],
     fields?: FieldsFilter,
@@ -1006,8 +1007,9 @@ export class ModelQueryBuilder<T> {
       ModelQueryBuilder | searchReadRecords
       - user: ${this.user.uid}
       - password: ${this.user.password}
-      - response: ${JSON.stringify(response.data.result)}
-    `);
+      - model: ${this.modelName}
+      - response:
+    `, response);
 
     return response.data.result;
   }

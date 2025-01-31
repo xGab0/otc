@@ -3,22 +3,17 @@ import Card from '~/components/cards/Card.vue';
 import IconClose from '~/components/icons/IconClose.vue';
 import IconMoreVert from '~/components/icons/IconMoreVert.vue';
 import IconPlus from '~/components/icons/IconPlus.vue';
-import type { Mailing } from '~/hooks/mailing';
 import type { Marketing } from '~/hooks/marketing';
 import type { OdooUserData } from '~/hooks/odoo/data';
 import { ModelQueryBuilder } from '~/hooks/odoo/wrapper';
-import ViewMarketingGroups from '~/views/marketing/groups/ViewMarketingGroups.vue';
-import ViewMarketingGroupsCreation from '~/views/marketing/groups/ViewMarketingGroupsCreation.vue';
-import ViewMarketingGroupsInfo from '~/views/marketing/groups/ViewMarketingGroupsInfo.vue';
-import ViewMarketingGroupsTable from '~/views/marketing/groups/ViewMarketingGroupsTable.vue';
+import ViewMarketingCampaignsCreation from '~/views/marketing/campaigns/ViewMarketingCampaignsCreation.vue';
+import ViewMarketingCampaignsInfo from '~/views/marketing/campaigns/ViewMarketingCampaignsInfo.vue';
+import ViewMarketingCampaignsTable from '~/views/marketing/campaigns/ViewMarketingCampaignsTable.vue';
 
 definePageMeta({
   middleware: 'auth',
   layout: 'main',
   pageTransition: { name: 'page', mode: 'out-in' }
-  /*pageTransition: {
-    name: 'rotate'
-  }*/
 });
 
 const router = useRouter();
@@ -26,33 +21,30 @@ const authStore = useAuthStore();
 const userDataStore = useUserDataStore();
 const userData = ref<OdooUserData>();
 
-const modelQueryBuilder = ref<ModelQueryBuilder<Marketing.Group>>();
-const groups = ref<Marketing.Group[]>([]);
+const modelQueryBuilder = ref<ModelQueryBuilder<Marketing.Campaign>>();
+const campaigns = ref<Marketing.Campaign[]>([]);
 
 const creatingRecord = ref<boolean>(false);
-const viewingRecord = ref<Marketing.Group>();
+const viewingRecord = ref<Marketing.Campaign>();
 
 onMounted(async () => {
   await userDataStore.init();
   userData.value = userDataStore.userData;
 
-  console.log('Marketing | userData');
-  console.log(userData.value);
+  modelQueryBuilder.value = authStore.odooUser?.modelQueryBuilder<Marketing.Campaign>('marketing.campaign');
 
-  modelQueryBuilder.value = authStore.odooUser?.modelQueryBuilder<Marketing.Group>('marketing.group');
+  campaigns.value = await modelQueryBuilder.value!.searchReadRecords();
 
-  groups.value = await modelQueryBuilder.value!.searchReadRecords();
-
-  console.log('Marketing | Groups');
-  console.log(groups.value);
+  console.log('Marketing | Campaigns');
+  console.log(campaigns.value);
 })
 </script>
 
 <template>
   <div class="mailings">
     <Card
-      title="Groups"
-      subtitle="View all the groups"
+      title="Campaigns"
+      subtitle="View all the campaigns"
     >
       <template v-slot:header>
         <div class="flex gap-2">
@@ -62,19 +54,19 @@ onMounted(async () => {
       </template>
 
       <template v-slot:body>
-        <ViewMarketingGroupsTable
-          :groups
-          @record-view="(plan) => {
-            viewingRecord = plan;
-            console.log('plan viewed: ', plan);
+        <ViewMarketingCampaignsTable
+          :campaigns
+          @record-view="(campaign) => {
+            viewingRecord = campaign;
+            console.log('campaign viewed: ', campaign);
           }"
         />
       </template>
     </Card>
 
     <Card v-if="creatingRecord && modelQueryBuilder"
-        title="Create new Group"
-        subtitle="Compile the form to make a new group"
+        title="Create new Campaign"
+        subtitle="Compile the form to make a new campaign"
     >
       <template v-slot:header>
         <div class="flex gap-2">
@@ -83,20 +75,20 @@ onMounted(async () => {
       </template>
 
       <template v-slot:body>
-        <ViewMarketingGroupsCreation
+        <ViewMarketingCampaignsCreation
           :model-query-builder="modelQueryBuilder"
-          @record-create="(group) => {
-            groups.push(group);
+          @record-create="(campaign) => {
+            campaigns.push(campaign);
             creatingRecord = false;
-            console.log('group pushed: ', group);
+            console.log('campaign pushed: ', campaign);
           }"
         />
       </template>
     </Card>
 
     <Card v-if="viewingRecord && modelQueryBuilder"
-        title="Group"
-        subtitle="View and modify this group"
+        title="Campaign"
+        subtitle="View and modify this campaign"
     >
       <template v-slot:header>
         <div class="flex gap-2">
@@ -105,18 +97,18 @@ onMounted(async () => {
       </template>
 
       <template v-slot:body>
-        <ViewMarketingGroupsInfo
+        <ViewMarketingCampaignsInfo
           :model-query-builder="modelQueryBuilder"
           :viewing-record="viewingRecord"
-          @record-modify="(group) => {
-            //groups.push(group);
-            console.log('group modified: ', group);
+          @record-modify="(campaign) => {
+            //plans.push(plan);
+            console.log('campaign modified: ', campaign);
           }"
           @record-delete="(id) => {
-            const indexToRemove = groups.findIndex(group => group.id === id);
+            const indexToRemove = campaigns.findIndex(campaign => campaign.id === id);
 
             if (indexToRemove !== -1) {
-              groups.splice(indexToRemove, 1);
+              campaigns.splice(indexToRemove, 1);
               viewingRecord === undefined;
             } else {
               console.error('Record not found!');

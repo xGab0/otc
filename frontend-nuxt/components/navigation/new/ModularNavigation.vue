@@ -2,7 +2,7 @@
 const { pages } = defineProps<{ pages: string[] }>();
 
 const emit = defineEmits<{
-  selected: [index: number]
+  selected: [page: string, index: number]
 }>()
 
 const bubble = ref<HTMLElement>();
@@ -38,7 +38,7 @@ const moveBubble = (event: MouseEvent) => {
     <span v-for="(page, index) in pages"
       @click="(event) => {
         selectedIndex = index;
-        emit('selected', index);
+        emit('selected', page, index);
         moveBubble(event);
       }"
       :class="{ 'selected': index === selectedIndex}"
@@ -58,9 +58,9 @@ const moveBubble = (event: MouseEvent) => {
   gap: 10px;
 
   border-radius: 14px;
-  background-color: rgb(244, 244, 244);
+  //background-color: rgb(244, 244, 244);
 
-  border: solid 1px rgb(227, 227, 227);
+  border: solid 1px rgb(236, 236, 236);
   box-shadow: inset rgba(0, 0, 0, 0.1) 0px 0px 10px;
 
   .bubble {

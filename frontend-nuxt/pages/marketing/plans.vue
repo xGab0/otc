@@ -15,6 +15,7 @@ import ViewMarketingPlansTable from '~/views/marketing/plans/ViewMarketingPlansT
 definePageMeta({
   middleware: 'auth',
   layout: 'main',
+  pageTransition: { name: 'page', mode: 'out-in' }
   /*pageTransition: {
     name: 'rotate'
   }*/
@@ -42,6 +43,9 @@ onMounted(async () => {
   modelQueryBuilder.value = authStore.odooUser?.modelQueryBuilder<Marketing.Plan>('marketing.plan');
 
   plans.value = await modelQueryBuilder.value!.searchReadRecords();
+
+  console.log('Marketing | Plans');
+  console.log(plans.value);
 })
 </script>
 

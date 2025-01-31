@@ -3,8 +3,8 @@ import type { Marketing } from '~/hooks/marketing';
 import type { ModelQueryBuilder } from '~/hooks/odoo/wrapper';
 
 interface Props {
-  modelQueryBuilder: ModelQueryBuilder<Marketing.Plan>,
-  viewingRecord: Marketing.Plan
+  modelQueryBuilder: ModelQueryBuilder<Marketing.Campaign>,
+  viewingRecord: Marketing.Campaign
 }
 
 const authStore = useAuthStore();
@@ -12,7 +12,7 @@ const authStore = useAuthStore();
 const { modelQueryBuilder, viewingRecord } = defineProps<Props>();
 
 const emit = defineEmits<{
-  recordModify: [plan: Marketing.Plan],
+  recordModify: [campaign: Marketing.Campaign],
   recordDelete: [id: number]
 }>()
 

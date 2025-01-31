@@ -13,9 +13,9 @@ const router = useRouter();
       </div>
 
       <div class="section navigation">
-        <ModularNavigation :pages="['dashboard', 'rubrica', 'gruppi', 'sms inviati', 'campagne sms']" />
-        <span @mousedown="() => router.push('/marketing/plans')">plans</span>
-        <span @mousedown="() => router.push('/marketing/groups')">groups</span>
+        <ModularNavigation :pages="['dashboard', 'plans', 'groups', 'campaigns']" @selected="(page, index) => {
+          router.push(`/marketing/${page}`)
+        }"/>
       </div>
 
       <div class="section controls">

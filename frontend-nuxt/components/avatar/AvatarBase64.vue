@@ -18,7 +18,6 @@ const {
 <template>
   <img v-if="imageBase64"
     :src="`data:image/png;base64,${imageBase64}`"
-    alt="avatar"
     class="avatar-dummy"
     :style="{ width: size, height: size, backgroundColor: color }"
   />

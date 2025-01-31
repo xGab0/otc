@@ -27,7 +27,6 @@ onMounted(async () => {
 <template>
   <img v-if="userId"
     :src="`data:image/png;base64,${imageBase64}`"
-    alt="avatar"
     class="avatar-dummy"
     :style="{ width: size, height: size, backgroundColor: color }"
   />
