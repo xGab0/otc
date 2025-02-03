@@ -2,6 +2,12 @@
 import IconPlus from '~/components/icons/IconPlus.vue';
 import ModularNavigation from '~/components/navigation/new/ModularNavigation.vue';
 
+definePageMeta({
+  middleware: 'auth',
+  layout: 'main'
+});
+
+
 const router = useRouter();
 </script>
 
@@ -9,7 +15,7 @@ const router = useRouter();
   <div class="sos">
     <div class="header">
       <div class="section title">
-        <span>Marketing</span>
+        <span>Marketing {{ router.currentRoute.value.path.split('/')[2] }}</span>
       </div>
 
       <div class="section navigation">
@@ -49,7 +55,7 @@ const router = useRouter();
       align-items: center;
 
       &.title {
-        width: 20%;
+        width: 25%;
 
         span {
           font-size: 26px;
@@ -58,12 +64,12 @@ const router = useRouter();
       }
 
       &.navigation {
-        width: 60%;
+        width: 50%;
         justify-content: center;
       }
 
       &.controls {
-        width: 20%;
+        width: 25%;
         justify-content: right;
       }
     }

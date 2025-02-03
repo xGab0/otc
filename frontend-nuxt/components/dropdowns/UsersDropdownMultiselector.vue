@@ -5,6 +5,8 @@ import DropdownRadio from './DropdownRadio.vue';
 //const elements = defineProps<{elements: any[]}>();
 const authStore = useAuthStore();
 
+const { selectedUsers } = defineProps<{selectedUsers: OdooUserData[]}>();
+
 const users = ref<OdooUserData[]>([]);
 
 const emit = defineEmits<{
@@ -30,10 +32,11 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="dropdown radio users">
-    <DropdownRadio
+  <div class="dropdown multiselector users">
+    <DropdownsDropdownMultiselector
       v-if="users"
       :elements="users"
+      :selected-elements="selectedUsers"
       @open-dropdown="onOpenDropdown"
       @close-dropdown="onCloseDropdown"
       @select-element="onElementSelected"
@@ -42,8 +45,8 @@ onMounted(async () => {
 </template>
 
 <style lang="scss" scoped>
-.dropdown.radio.users {
-  &.radio {
+.dropdown.multiselector.users {
+  &.multiselector {
     &.users {
       padding: 8px;
       border-radius: 8px;

@@ -30,6 +30,10 @@ onMounted(async () => {
       </div>
 
       <div class="column data">
+        <span>SMS total count</span>
+      </div>
+
+      <div class="column data">
         <span>SMS daily count</span>
       </div>
 
@@ -52,7 +56,11 @@ onMounted(async () => {
         </div>
 
         <div class="column data">
-          {{ plan.sms_daily_count }}
+          {{ plan.sms_max_count }}
+        </div>
+
+        <div class="column data">
+          {{ plan.sms_max_daily_count }}
         </div>
 
         <div class="column data">

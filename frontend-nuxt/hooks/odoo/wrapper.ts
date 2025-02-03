@@ -143,7 +143,15 @@ export class OdooConnection {
 }
 
 export interface OdooRecord {
-  id: number
+  id: number,
+
+  create_date: string,
+  create_uid: [number, string],
+
+  write_date: string,
+  write_uid: [number, string],
+
+  __last_update: string
 }
 
 export class OdooUser {
@@ -167,6 +175,45 @@ export class OdooUser {
 
   public getModule<T>(moduleName: string): OdooModule {
     return new OdooModule(this, 475, moduleName);
+  }
+
+  public async callFunction<T>(modelName: string, functionName: string, args: any[] = []): Promise<T> {
+    const params = {
+      service: 'object',
+      method: 'execute_kw',
+      args: [
+        this.database,
+        this.uid,
+        this.password,
+        modelName,
+        functionName,
+        args,
+        {}
+      ],
+    }
+
+    const payload = {
+      jsonrpc: '2.0',
+      method: 'call',
+      params: params,
+      id: 3,  // ID della richiesta
+    };
+
+    const response = await this.connection.client.post('', payload);
+
+    if (DEBUG) {
+      console.log(`
+        OdooUser | callFunction
+        - user_uid: ${this.uid}
+        - password: ${this.password}
+        - model: ${modelName}
+        - function: ${functionName}
+        - args: ${args}
+        - response:
+      `, response);
+    }
+
+    return response.data.result;
   }
 
   public async getAllModules(): Promise<any> {

@@ -46,12 +46,14 @@ const modifyPlan = async (name: string, smsDailyCount: number, smsMaxLength: num
 }
 
 const deletePlan = async (id: number) => {
-  const foundRecords = await authStore.odooUser!.searchRecords('marketing.group', [['marketing_plan_id', '=', id]]);
+  //const foundRecords = await authStore.odooUser!.searchRecords('marketing.group', [['marketing_plan_id', '=', id]]);
 
+  /*
   if (foundRecords.length > 0) {
     console.error(`You can't delete this plan because it's assigned to some marketing groups ${foundRecords.length}`);
     return
   }
+  */
 
   const deleted = await modelQueryBuilder.deleteRecord(id);
 
@@ -73,16 +75,6 @@ const deletePlan = async (id: number) => {
       <div class="option">
         <span class="key">Name</span>
         <input class="value" v-model="formName" type="text" placeholder="compile this field" />
-      </div>
-
-      <div class="option">
-        <span class="key">SMS daily count</span>
-        <input class="value" v-model="formSmsDailyCount" type="number" placeholder="compile this field" />
-      </div>
-
-      <div class="option">
-        <span class="key">SMS max length</span>
-        <input class="value" v-model="formSmsMaxLength" type="number" placeholder="compile this field" />
       </div>
     </form>
 

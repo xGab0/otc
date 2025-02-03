@@ -107,6 +107,39 @@ onMounted(async () => {
         </div>
       </div>
     </div>
+
+    <div class="section">
+      <div class="header">
+        <span>marketing</span>
+      </div>
+
+      <div class="body">
+        <div class="element" :class="{ 'selected': router.currentRoute.value.path.startsWith('/marketing') }" @mousedown="() => router.push('/marketing/dashboard')">
+          <IconRhombus/>
+          <span>dashboard</span>
+        </div>
+
+        <div class="element" :class="{ 'selected': router.currentRoute.value.path === '/contacts'}" @mousedown="() => router.push('/contacts')">
+          <IconRhombus/>
+          <span>plans</span>
+        </div>
+
+        <div class="element">
+          <IconRhombus/>
+          <span>groups</span>
+        </div>
+
+        <div class="element">
+          <IconRhombus/>
+          <span>persone</span>
+        </div>
+
+        <div class="element">
+          <IconRhombus/>
+          <span>campaigns</span>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 

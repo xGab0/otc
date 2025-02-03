@@ -1,17 +1,19 @@
 <script setup lang="ts">
 interface Props {
-  width?: number,
-  height?: number,
-  fill?: string,
+  size?: number,
+  fill?: string
 }
 
-const { width = 24, height = 24, fill = 'black' } = defineProps<Props>();
+const { 
+  size = 24,
+  fill = 'black'
+} = defineProps<Props>();
 </script>
 
 <template>
   <svg
-    :width
-    :height
+    :width="size"
+    :height="size"
     viewBox="0 0 24 24"
     fill="none"
     xmlns="http://www.w3.org/2000/svg"

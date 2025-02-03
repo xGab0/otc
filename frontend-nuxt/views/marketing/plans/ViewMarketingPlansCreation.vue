@@ -13,10 +13,11 @@ const emit = defineEmits<{
 }>()
 
 const formName = ref<string>('');
-const formSmsDailyCount = ref<number>(10);
+const formSmsMaxCount = ref<number>(100);
+const formSmsMaxDailyCount = ref<number>(10);
 const formSmsMaxLength = ref<number>(256);
 
-const createPlan = async (name: string, smsDailyCount: number, smsMaxLength: number) => {
+const createPlan = async (name: string, smsMaxCount: number, smsMaxDailyCount: number, smsMaxLength: number) => {
   console.log(`creating a new plan named ${name}`);
 
   const foundRecords = await modelQueryBuilder.searchRecords([['name', '=', name]]);
@@ -28,7 +29,8 @@ const createPlan = async (name: string, smsDailyCount: number, smsMaxLength: num
 
   const recordBody = {
     name: name,
-    sms_daily_count: smsDailyCount,
+    sms_max_count: smsMaxCount,
+    sms_max_daily_count: smsMaxDailyCount,
     sms_max_length: smsMaxLength
   };
 
@@ -51,8 +53,13 @@ const createPlan = async (name: string, smsDailyCount: number, smsMaxLength: num
       </div>
 
       <div class="option">
-        <span>SMS daily count <span class="obbligatory">*</span></span>
-        <input v-model="formSmsDailyCount" type="number" placeholder="compile this field" />
+        <span>SMS max count <span class="obbligatory">*</span></span>
+        <input v-model="formSmsMaxCount" type="number" placeholder="compile this field" />
+      </div>
+
+      <div class="option">
+        <span>SMS max daily count <span class="obbligatory">*</span></span>
+        <input v-model="formSmsMaxDailyCount" type="number" placeholder="compile this field" />
       </div>
 
       <div class="option">
@@ -62,7 +69,7 @@ const createPlan = async (name: string, smsDailyCount: number, smsMaxLength: num
     </form>
 
     <div class="footer">
-      <span @mousedown="async () => await createPlan(formName, formSmsDailyCount, formSmsMaxLength)">Create</span>
+      <span @mousedown="async () => await createPlan(formName, formSmsMaxCount, formSmsMaxDailyCount, formSmsMaxLength)">Create</span>
     </div>
   </div>
 </template>

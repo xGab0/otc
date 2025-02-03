@@ -34,8 +34,7 @@ const createCampaign = async (name: string, marketing_group_id: number) => {
 
   const recordBody = {
     name: name,
-    marketing_group_id: marketing_group_id,
-    sms_ids: []
+    marketing_group_id: marketing_group_id
   };
 
   const recordId = await modelQueryBuilder.createRecord(recordBody);
@@ -47,9 +46,9 @@ const createCampaign = async (name: string, marketing_group_id: number) => {
   if (newCampaign === undefined) {
     console.error('For some reasons the just created record is not retrieved');
     return;
+  } else {
+    emit('recordCreate', newCampaign);
   }
-  
-  emit('recordCreate', newCampaign);
 }
 
 onMounted(async() => {
@@ -66,7 +65,7 @@ onMounted(async() => {
       </div>
 
       <div class="option plan">
-        <span>Group <span class="obbligatory">*</span></span>
+        <span>Group <span class="obbligatory">*</span></span> {{ selectedGroup }}
         <span tabindex="1" @focus="showTendina = true" @blur="showTendina = false" class="selector">
           {{ selectedGroup === undefined ? 'select a group' : selectedGroup.name }}
         </span>
@@ -75,6 +74,11 @@ onMounted(async() => {
             {{ group.name }}
           </span>
         </div>
+      </div>
+
+      <div class="option sms">
+        <span>SMS <span class="obbligatory">*</span></span>
+        <input v-model="formName" type="text" placeholder="compile this field" />
       </div>
     </form>
 

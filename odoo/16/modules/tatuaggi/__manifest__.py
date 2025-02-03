@@ -11,7 +11,7 @@
     ],
     "data": [
         'security/ir.model.access.csv',
-        'security/marketing_security.xml',
+        #'security/marketing_security.xml',
         #'security/security.xml',
 
         #'views/tatuaggi_view.xml',

@@ -5,6 +5,8 @@ import type { Marketing } from '~/hooks/marketing';
 
 const { campaigns } = defineProps<{ campaigns: Marketing.Campaign[] }>();
 
+const router = useRouter();
+
 const emit = defineEmits<{
   recordView: [plan: Marketing.Campaign]
 }>()
@@ -52,14 +54,15 @@ onMounted(async () => {
         </div>
 
         <div class="column data">
-          {{ campaign.marketing_group_id }}
+          {{ campaign.marketing_group_id[1] }}
         </div>
 
         <div class="column data">
-          {{ campaign.sms_ids }}
+          {{ campaign.sms_ids.length }}
         </div>
 
         <div class="column actions">
+          <span @mousedown="() => router.push(`/marketing/campaign/${campaign.id}`)">open</span>
           <IconMore @mousedown="() => emit('recordView', campaign)" />
         </div>
       </div>
