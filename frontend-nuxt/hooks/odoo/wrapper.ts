@@ -1139,7 +1139,7 @@ export class ModelQueryBuilder<T> {
     return response.data.result;
   }
 
-  public async deleteRecord(recordId: number): Promise<any> {
+  public async deleteRecordById(recordId: number): Promise<any> {
     const params = {
       service: 'object',
       method: 'execute_kw',
@@ -1172,6 +1172,10 @@ export class ModelQueryBuilder<T> {
     }
 
     return response.data.result;
+  }
+
+  public async deleteRecord(record: OdooRecord): Promise<any> {
+    return this.deleteRecordById(record.id);
   }
 
 }

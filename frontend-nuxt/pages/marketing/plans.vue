@@ -14,7 +14,6 @@ import ViewMarketingPlansTable from '~/views/marketing/plans/ViewMarketingPlansT
 
 definePageMeta({
   middleware: 'auth',
-  layout: 'main',
   pageTransition: { name: 'page', mode: 'out-in' }
   /*pageTransition: {
     name: 'rotate'

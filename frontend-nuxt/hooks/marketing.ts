@@ -3,36 +3,36 @@ import type { OdooRecord } from "./odoo/wrapper"
 export namespace Marketing {
 
     export interface Campaign extends OdooRecord {
-        name: string,
-        description: string,
-        marketing_group_id: [number, string],
-        sms_ids: any
+        readonly name: string,
+        readonly description: string,
+        readonly marketing_group_id: [number, string],
+        readonly sms_ids: any
     }
 
     export interface Group extends OdooRecord {
-        name: string,
-        description: string,
-        marketing_plan_id: [number, string],
-        member_ids: any
+        readonly name: string,
+        readonly description: string,
+        readonly marketing_plan_id: [number, string],
+        readonly member_ids: any
     }
 
     export interface Plan extends OdooRecord {
-        name: string,
-        description: string,
-        sms_max_length: number
-        sms_max_daily_count: number,
-        sms_max_count: number,
+        readonly name: string,
+        readonly description: string,
+        readonly sms_max_length: number
+        readonly sms_max_daily_count: number,
+        readonly sms_max_count: number,
     }
 
     export interface Sms extends OdooRecord {
-        name: string,
-        description: string,
-        body: string,
-        partner_ids: any,
-        contacts_domain: any,
-        scheduled_date: string,
-        marketing_campaign_id: [number, string],
-        status: 'draft' | 'scheduled' | 'sent'
+        readonly name: string,
+        readonly description: string,
+        readonly body: string,
+        readonly partner_ids: any,
+        readonly contacts_domain: any,
+        readonly scheduled_date: string,
+        readonly marketing_campaign_id: [number, string],
+        readonly status: 'draft' | 'scheduled' | 'sent'
     }
 
 }

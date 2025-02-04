@@ -17,7 +17,6 @@ import ViewContacts from '~/views/ViewContacts.vue';
 
 definePageMeta({
   middleware: 'auth',
-  layout: 'main',
   pageTransition: { name: 'page', mode: 'out-in' }
   /*pageTransition: {
     name: 'rotate'

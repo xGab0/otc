@@ -1,20 +1,31 @@
 <script setup lang="ts">
 import IconPlus from '~/components/icons/IconPlus.vue';
 import ModularNavigation from '~/components/navigation/new/ModularNavigation.vue';
-import Marketing from '~/layouts/marketing.vue';
-
-definePageMeta({
-  middleware: 'auth',
-  layout: 'main'
-});
 
 const router = useRouter();
 </script>
 
 <template>
-  <Marketing>
-    <NuxtPage />
-  </Marketing>
+  <div class="sos">
+    <div class="header">
+      <div class="section title">
+        <!--span>Marketing {{ router.currentRoute.value.path.split('/')[2] }}</span-->
+        <span>Marketing</span>
+      </div>
+
+      <div class="section navigation">
+        <ModularNavigation :pages="['dashboard', 'plans', 'groups', 'campaigns']" @selected="(page, index) => {
+          router.push(`/marketing/${page}`)
+        }"/>
+      </div>
+
+      <div class="section controls">
+        <IconPlus />
+      </div>
+    </div>
+
+    <slot/>
+  </div>
 </template>
 
 <style lang="scss" scoped>
@@ -42,8 +53,8 @@ const router = useRouter();
         width: 25%;
 
         span {
-          font-size: 26px;
-          font-weight: 500;
+          font-size: 28px;
+          font-weight: 600;
         }
       }
 

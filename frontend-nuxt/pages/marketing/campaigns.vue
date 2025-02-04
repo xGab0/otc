@@ -12,7 +12,6 @@ import ViewMarketingCampaignsTable from '~/views/marketing/campaigns/ViewMarketi
 
 definePageMeta({
   middleware: 'auth',
-  layout: 'main',
   pageTransition: { name: 'page', mode: 'out-in' }
 });
 

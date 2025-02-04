@@ -1,24 +1,21 @@
 <script setup lang="ts">
+import { ssrGetDynamicModelProps } from 'vue/server-renderer';
+import BadgeDynamic from '~/components/badges/BadgeDynamic.vue';
 import Card from '~/components/cards/Card.vue';
-import CardMarketingDraft from '~/components/cards/marketing/CardMarketingSmsDraft.vue';
-import IconClose from '~/components/icons/IconClose.vue';
+import UsersDropdown from '~/components/dropdowns/UsersDropdown.vue';
 import IconGrid from '~/components/icons/IconGrid.vue';
-import IconLayoutList from '~/components/icons/IconLayoutList.vue';
 import IconMoreVert from '~/components/icons/IconMoreVert.vue';
 import IconPlus from '~/components/icons/IconPlus.vue';
 import IconCircle from '~/components/icons/shapes/IconCircle.vue';
-import ModularNavigation from '~/components/navigation/ModularNavigation.vue';
 import type { Marketing } from '~/hooks/marketing';
 import { ModelQueryBuilder } from '~/hooks/odoo/wrapper';
-import ViewMailingDraft from '~/views/mailing/ViewMailingDraft.vue';
-import ViewMailingInQueue from '~/views/mailing/ViewMailingInQueue.vue';
-import ViewMailingSent from '~/views/mailing/ViewMailingSent.vue';
 import ViewMarketingSmsCreation from '~/views/marketing/sms/ViewMarketingSmsCreation.vue';
 import ViewMarketingSmsDraft from '~/views/marketing/sms/ViewMarketingSmsDraft.vue';
+import ViewMarketingSmsScheduled from '~/views/marketing/sms/ViewMarketingSmsScheduled.vue';
 
 definePageMeta({
   middleware: 'auth',
-  layout: 'main'
+  //pageTransition: { name: 'page', mode: 'out-in' }
 });
 
 const router = useRouter();
@@ -62,18 +59,25 @@ onMounted(async () => {
           </template>
 
           <template v-slot:body>
-            <ViewMarketingSmsCreation :model-query-builder="modelQueryBuilder!" :marketing-campaign-id="Number(route.params.id)" />
+            <ViewMarketingSmsCreation
+              :model-query-builder="modelQueryBuilder!"
+              :marketing-campaign-id="Number(route.params.id)"
+              @record-create="(record) => {
+                showMenuCreate = false;
+                messages!.push(record);
+              }"
+            />
           </template>
         </Card>
       </div>
     </div>
   </Teleport>
 
-  <div v-if="campaign">
-    <div class="wtf flex justify-between">
-      <div class="flex flex-col">
-        <span>{{ campaign.name }}</span>
-        <span>{{ campaign.description }}</span>
+  <div v-if="campaign && modelQueryBuilder" class="campaign">
+    <div class="header">
+      <div class="bio">
+        <BadgeDynamic name="campaign" :color="{ r: 255, g: 225, b: 222 }" style="font-size: 11px;" />
+        <span class="title">{{ campaign.name }}</span>
       </div>
 
       <div class="selector layout">
@@ -102,8 +106,8 @@ onMounted(async () => {
       </div>
     </div>
 
-    <div class="campaign">
-      <Card title="Draft">
+    <div class="messages">
+      <Card title="Draft" style="z-index: 40">
         <template v-slot:header>
           <div class="flex gap-2">
             <IconPlus style="cursor: pointer" @mousedown="() => showMenuCreate = true" />
@@ -112,23 +116,52 @@ onMounted(async () => {
         </template>
 
         <template v-slot:body v-if="messages">
-          <ViewMarketingSmsDraft :messages="messages.filter(message => message.status === 'draft')" />
+          <ViewMarketingSmsDraft
+            :model-query-builder="modelQueryBuilder"
+            :messages="messages.filter(message => message.status === 'draft')"
+            @record-scheduled="(oldSms, newSms, date) => {
+              const index = messages!.findIndex(foundMessage => foundMessage.id === oldSms.id);
+
+              if (index !== -1) {
+                messages!.splice(index, 1, newSms);
+                console.info('scheduled record with id ', oldSms.id);
+              }
+            }"
+            @record-delete="(sms) => {
+              const index = messages!.findIndex(foundMessage => foundMessage.id === sms.id);
+
+              if (index !== -1) {
+                messages!.splice(index, 1)
+              }
+            }"
+          />
         </template>
       </Card>
 
-      <Card title="InQueue">
+      <Card title="Scheduled" style="z-index: 30">
         <template v-slot:header>
           <div class="operations">
             
           </div>
         </template>
 
-        <template v-slot:body>
+        <template v-slot:body v-if="messages">
           <!--ViewMailingInQueue :mailings="messages.filter(message => message.status === 'scheduled')" /-->
+          <ViewMarketingSmsScheduled
+            :model-query-builder="modelQueryBuilder"
+            :messages="messages.filter(message => message.status === 'scheduled')"
+            @record-delete="(sms) => {
+              const index = messages!.findIndex(foundMessage => foundMessage.id === sms.id);
+
+              if (index !== -1) {
+                messages!.splice(index, 1)
+              }
+            }"
+          />
         </template>
       </Card>
 
-      <Card title="Sent">
+      <Card title="Sent" style="z-index: 20">
         <template v-slot:header>
           <div class="operations">
             
@@ -176,57 +209,34 @@ onMounted(async () => {
   }
 }
 
-.sos {
-  width: 100%;
-
+.campaign {
   display: flex;
   flex-direction: column;
-  gap: 20px;
-
-  padding: .875rem;
-  border-radius: 24px;
-  //background-color: rgb(242, 242, 242);
-  background-color: white;
+  gap: 10px;
 
   > .header {
     display: flex;
     justify-content: space-between;
+    align-items: center;
 
-    > .section {
+    > .bio {
       display: flex;
       align-items: center;
+      gap: 6px;
 
-      &.title {
-        width: 20%;
-
-        span {
-          font-size: 26px;
-          font-weight: 500;
-        }
-      }
-
-      &.navigation {
-        width: 60%;
-        justify-content: center;
-      }
-
-      &.controls {
-        width: 20%;
-        justify-content: right;
+      > .title {
+        font-size: 22px;
+        font-weight: 500;
+        text-transform: capitalize;
+        color: rgb(33, 33, 33);
       }
     }
   }
-}
 
-.campaign {
-  display: flex;
-  grid-template-columns: auto auto auto auto;
-  gap: 12px;
-}
-
-.separator {
-  width: 100%;
-  height: 1px;
-  background-color: rgba(0, 0, 0, 0.102);
+  > .messages {
+    display: flex;
+    grid-template-columns: auto auto auto auto;
+    gap: 12px;
+  }
 }
 </style>

@@ -7,8 +7,7 @@ import IconMoreVert from '~/components/icons/IconMoreVert.vue';
 import IconTime from '~/components/icons/IconTime.vue';
 import IconTrash from '~/components/icons/IconTrash.vue';
 import ItemMailingName from '~/components/items/mailing/ItemMailingName.vue';
-import RecordCreator from '~/components/RecordCreator.vue';
-import WidgetCalendar from '~/components/widget/WidgetCalendar.vue';
+import ItemMailingScheduleDate from '~/components/items/mailing/ItemMailingScheduleDate.vue';
 import type { Marketing } from '~/hooks/marketing';
 import type { ModelQueryBuilder } from '~/hooks/odoo/wrapper';
 import ViewMarketingSmsSchedule from '~/views/marketing/sms/ViewMarketingSmsSchedule.vue';
@@ -37,8 +36,6 @@ const { modelQueryBuilder, sms } = defineProps<Props>();
 const date = ref<[month: string, day: string]>(formatDateToText(new Date(sms.create_date)));
 
 const emit = defineEmits<{
-  recordModified: [oldSms: Marketing.Sms, newSms: Marketing.Sms],
-  recordScheduled: [oldSms: Marketing.Sms, newSms: Marketing.Sms, date: Date],
   recordDelete: [sms: Marketing.Sms]
 }>()
 
@@ -60,7 +57,7 @@ const deleteRecord = async (record: Marketing.Sms) => {
 </script>
 
 <template>
-  <div class="draft">
+  <div class="scheduled">
     <div class="header">
       <div class="data">
         <BadgeMailingType type="sms" />
@@ -71,7 +68,17 @@ const deleteRecord = async (record: Marketing.Sms) => {
     </div>
     
     <div class="body">
-      <span>{{ sms.body }}</span>
+      <div class="content">
+        <span>{{ sms.body }}</span>
+      </div>
+
+      <div class="info">
+        <div class="badge">
+          <IconCalendar :width="16" :height="16" fill_0="rgb(100, 77, 0)" fill_1="rgb(100, 77, 0)" />
+          <ItemMailingScheduleDate :date="new Date(sms.scheduled_date)" />
+          <span class="info">scheduled date</span>
+        </div>
+      </div>
     </div>
 
     <div class="separator" />
@@ -95,26 +102,14 @@ const deleteRecord = async (record: Marketing.Sms) => {
 
         <div class="schedule" @mousedown.left="() => showScheduleMenu = !showScheduleMenu">
           <IconTime :width="20" :height="20"  />
-          <span>schedule</span>
+          <span>re-schedule</span>
 
           <div v-if="showContextMenu" class="hitbox">
             <ViewMarketingSmsSchedule
               :model-query-builder="modelQueryBuilder"
               :marketing-sms="sms"
-              @record-scheduled="(oldSms, newSms , date) => {
-                emit('recordModified', oldSms, newSms);
-                emit('recordScheduled', oldSms, newSms, date)
-              }"
+              @record-modified="(id) => {}"
             />
-
-            <!--div class="schedule-menu">
-              <WidgetCalendar :attendances="[]" lang="it-IT" />
-
-              <div class="button">
-                <IconTime :size="16" fill="green" />
-                <span>schedule</span>
-              </div>
-            </div-->
           </div>
         </div>
 
@@ -130,48 +125,6 @@ const deleteRecord = async (record: Marketing.Sms) => {
 </template>
 
 <style lang="scss" scoped>
-/*
-.schedule-menu {
-  position: absolute;
-  left: 110%;
-  top: 0px;
-
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-
-  padding: .475rem;
-  border-radius: 12px;
-  outline: solid 1px rgb(219, 219, 219);
-
-  background-color: rgba(255, 255, 255, 0.8);
-  backdrop-filter: brightness(200%) blur(4px);
-
-  > .button {
-    width: fit-content;
-
-    display: flex;
-    align-items: center;
-    gap: 6px;
-
-    padding-left: .275rem;
-    padding-right: .275rem;
-    padding-top: .125rem;
-    padding-bottom: .125rem;
-
-    border-radius: 6px;
-    background-color: rgb(195, 255, 200);
-
-    cursor: pointer;
-
-    > span {
-      font-size: 14px;
-      font-weight: 500;
-      color: rgb(40, 141, 57);
-    }
-  }
-}
-*/
 .context-menu {
   position: absolute;
   //left: 100%; /* Sposta il div completamente a destra del genitore */
@@ -253,9 +206,9 @@ const deleteRecord = async (record: Marketing.Sms) => {
   }
 }
 
-.draft {
+.scheduled {
   z-index: 12;
-  position: relative; 
+  position: relative;
   min-width: 200px;
 
   display: flex;
@@ -288,15 +241,62 @@ const deleteRecord = async (record: Marketing.Sms) => {
   }
 
   > .body {
-    max-width: 96%;
-
     line-height: normal;
     text-wrap: wrap;
     text-align: left;
 
-    span {
-      font-size: 14px;
-      color: rgb(75, 75, 75);
+    > .content {
+      max-width: 96%;
+
+      span {
+        font-size: 14px;
+        color: rgb(75, 75, 75);
+      }
+    }
+
+    > .info {
+      position: relative;
+      display: flex;
+      justify-content: right;
+      margin-top: 8px;
+
+      > .badge {
+        width: fit-content;
+
+        display: flex;
+        align-items: center;
+        gap: 4px;
+
+        padding-left: .175rem;
+        padding-right: .375rem;
+        padding-top: .075rem;
+        padding-bottom: .075rem;
+
+        border-radius: 6px;
+        background-color: rgb(255, 234, 166);
+
+        > .info {
+          position: absolute;
+          bottom: 100%;
+
+          opacity: 0;
+          padding: .135rem;
+          transition: opacity 0.2s ease-in-out;
+
+          font-size: 12px;
+          text-align: center;
+          color: rgb(100, 77, 0);
+
+          backdrop-filter: blur(3px);
+        }
+
+        &:hover {
+          > .info {
+            
+            opacity: 1
+          }
+        }
+      }
     }
   }
 

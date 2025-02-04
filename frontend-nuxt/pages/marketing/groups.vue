@@ -14,7 +14,6 @@ import ViewMarketingGroupsTable from '~/views/marketing/groups/ViewMarketingGrou
 
 definePageMeta({
   middleware: 'auth',
-  layout: 'main',
   pageTransition: { name: 'page', mode: 'out-in' }
   /*pageTransition: {
     name: 'rotate'

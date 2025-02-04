@@ -68,3 +68,9 @@ class MarketingSms(models.Model):
             # Se lo stato è 'scheduled' o 'sent', la scheduled_date deve essere impostata
             if record.status in ['scheduled', 'sent'] and not record.scheduled_date:
                 raise ValidationError("La data programmata ('scheduled_date') deve essere specificata quando lo stato è 'Programmato' o 'Inviato'.")
+
+    @api.onchange('scheduled_date')
+    def _onchange_scheduled_date(self):
+        """Imposta automaticamente lo stato a 'scheduled' quando viene inserita una data"""
+        if self.scheduled_date:
+            self.status = 'scheduled'

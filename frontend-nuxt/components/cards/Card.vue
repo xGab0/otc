@@ -22,6 +22,9 @@ const { title, subtitle = '' } = defineProps<Props>();
 
 <style lang="scss" scoped>
 .card {
+  z-index: 10;
+  position: relative;
+
   width: 100%;
   padding: .575rem .775rem .875rem .775rem;
 
